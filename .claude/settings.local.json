@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"console.log\\(require\\('fs'\\).existsSync\\('C:/Users/yriyl/OneDrive/Робочий стіл/aonixsite/node_modules'\\)\\)\")",
+      "Bash(identify \"/c/Users/yriyl/Downloads/Desktop - 25.png\")"
+    ]
+  }
+}

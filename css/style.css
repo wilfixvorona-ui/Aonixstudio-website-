@@ -1,0 +1,2009 @@
+/* ============================================
+   FONTS
+
+   Anton      — Google Fonts (confirmed)
+   Bricolage Grotesque — Google Fonts (confirmed), the main body font.
+   Every element using var(--font-body) also gets the tracking/leading
+   pair below (--font-body-tracking / --font-body-leading) so the look
+   stays consistent wherever the font is used.
+   SUSE Mono  — Google Fonts, a second accent/mono style — use
+   var(--font-mono) or class .font-mono wherever it's wanted
+   Stack Sans Notch (Light) — NOT confirmed on Google Fonts yet.
+   Poppins Light is used as a temporary stand-in below so the
+   layout reads correctly. Send the real Fonts link / files and
+   this block gets swapped, nothing else in the file changes.
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Poppins:wght@300;400;500;700&family=SUSE+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --color-black: #0a0a0a;
+  --color-white: #ffffff;
+  --color-bg: #f1f1f1;
+  --color-muted: #c7c7c7;
+  --color-note: #6f6f6f;
+
+  --gradient-start: #D50000;
+  --gradient-end: #8D36FF;
+
+  --font-display: 'Anton', sans-serif;
+  --font-heading: 'Stack Sans Notch', 'Poppins', sans-serif;
+  --font-body: 'Bricolage Grotesque', sans-serif;
+  --font-body-tracking: -0.06em;
+  --font-body-leading: 1;
+  --font-mono: 'SUSE Mono', monospace;
+
+  /* Shared grid controls for .projects AND .pricing — change a value
+     here and both sections update together. */
+  --section-max-width: 1600px;  /* content width the grid is centered in */
+  --section-edge-padding: 64px; /* left/right gap to the screen edge */
+  --card-gap: 40px;             /* gap between cards/thumbnails in the grid */
+  --card-radius: 32px;           /* corner rounding of cards/thumbnails */
+
+  /* Pricing-card fine-tuning — every spacing inside .pricing-card reads
+     from one of these, so tweaking a value here updates both the
+     Landing Page and Multi-page cards together. */
+  --pricing-card-padding: clamp(32px, 4vw, 56px); /* inner padding of each card */
+  --pricing-title-gap: clamp(12px, 1vw, 20px);    /* space under the card title */
+  --pricing-meta-gap: clamp(28px, 4vw, 40px);     /* space under the price/deadline badges */
+  --pricing-list-gap: 14px;                       /* space between "you will get" rows */
+  --pricing-list-scale: 1.2;                        /* scales the checklist text + checkbox together */
+  --pricing-actions-gap: clamp(14px, 2.5vw, 14px);  /* space above the Buy/Ask Question buttons */
+
+  /* FAQ scale — one knob that scales the question text, the answer
+     text, the chevron and the card's own padding together. */
+  --faq-scale: 1.3;
+  --faq-sticky-offset: clamp(24px, 4vw, 48px); /* gap from the viewport top while .faq-intro is stuck */
+
+  --dock-height: 76px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-black);
+  font-family: var(--font-heading);
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* drop this on anything that should use SUSE Mono instead of the
+   default body font (Cabinet Grotesk) */
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* ============================================
+   REUSABLE FLOWING GRADIENT
+   Apply .gradient-flow to any background (buttons, chips, etc.)
+   and .gradient-text to any text — both share one moving gradient
+   so new sections stay consistent with this effect automatically.
+   ============================================ */
+
+.gradient-flow,
+.gradient-text {
+  background: linear-gradient(
+    100deg,
+    var(--gradient-start) 0%,
+    var(--gradient-end) 45%,
+    var(--gradient-start) 100%
+  );
+  background-size: 250% 250%;
+  animation: gradientFlow 6s ease-in-out infinite;
+}
+
+.gradient-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes gradientFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+}
+
+.hero-pin {
+  padding-top: clamp(24px, 5vw, 64px);
+  overflow-x: clip;   /* замість overflow: hidden */
+}
+
+.hero-headline {
+  display: block;
+  line-height: 0.85;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  color: var(--color-black);
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  text-align: center;
+  width: 100%;
+
+  /* зсув вгору для обрізки */
+  margin-top: -8vw; /* негативний відступ підтягує текст вгору */
+  /* або */
+  position: relative;
+  top: 30px; /* фіксоване значення, якщо потрібна точність незалежно від ширини */
+}
+
+.hero-headline .line {
+  font-size: clamp(6rem, 28vw, 317px);
+  letter-spacing: -0.01em;
+}
+
+/* Frosted (matte) glass: strong blur + a fine noise grain so it reads
+   as sandblasted glass, not a shiny/glossy tinted pill. */
+.badge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.1em 2.1em;
+  border-radius: 999px;
+  overflow: hidden; /* clips the noise layer to the pill shape */
+
+  /* СКЛО — матове */
+  background: rgba(60, 60, 60, 0.4);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.22),
+    inset 0 1px 1px rgba(255, 255, 255, 0.28),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+
+  color: var(--color-white);
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-weight: 400;
+  font-size: clamp(0.95rem, 1.4vw, 1.4rem);
+  white-space: nowrap;
+  z-index: 2;
+}
+/* frosted grain — a tiled noise texture (feTurbulence) instead of a
+   glossy diagonal sheen; this is what sells the "matte" read */
+.badge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  opacity: 0.45;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.badge span {
+  position: relative;
+  z-index: 1;
+}
+
+.badge-1 {
+  top: 17%;
+  left: 2%;
+  transform: rotate(-6deg);
+}
+
+.badge-2 {
+  top: 22%;
+  right: 3%;
+  transform: rotate(4deg);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(24px, 4vw, 64px);
+  max-width: 1400px;
+  margin: clamp(32px, 6vw, 72px) auto 0;
+  padding: 0 clamp(24px, 4vw, 56px);
+}
+
+.hero-heading {
+  font-family: var(--font-heading);
+  font-weight: 300;
+  font-size: clamp(1.9rem, 3.6vw, 4.2rem);
+  line-height: 0.9;
+  max-width: 20ch;
+  color: var(--color-black);
+
+  /* Ручне підстроювання позиції: перше число — вправо(+)/вліво(-),
+     друге — вниз(+)/вгору(-). Не впливає на .hero-note, бо не займає
+     місце в layout — просто зсуває сам заголовок. */
+  transform: translate(-64px, 32px);
+}
+
+.hero-heading .muted {
+  color: var(--color-muted);
+}
+
+.hero-note {
+  flex-shrink: 0;
+  max-width: 320px;
+  margin-bottom: 0.4em;
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-weight: 400;
+  font-size: 20px;
+  text-transform: uppercase;
+  color: #000000;
+}
+
+/* ============================================
+   PROJECTS
+   ============================================ */
+
+.projects {
+  position: relative;
+  max-width: var(--section-max-width);
+  margin: 0 auto;
+  padding: var(--section-edge-padding);
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--card-gap);
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.project-thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--card-radius);
+  margin-bottom: 12px;
+  overflow: hidden; /* clips both the zoomed media and the cursor badge */
+  cursor: none; /* the custom .project-cursor badge replaces it on hover */
+}
+
+/* Placeholder gradient where a real photo hasn't been dropped in yet.
+   Once you add one, put it INSIDE as <img class="project-thumb-media">
+   — the img rule below sizes/crops it to fill the frame (object-fit:
+   cover) instead of rendering at its native pixel size, which is what
+   "zoomed in" looks like when an <img> has no sizing of its own. */
+.project-thumb-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: linear-gradient(135deg, #ececec, #dcdcdc);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.project-thumb-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-thumb:hover .project-thumb-media {
+  transform: scale(1.08);
+}
+
+/* Custom cursor: follows the pointer (see js/script.js) instead of
+   sitting fixed in the center, and fades/scales in on hover. */
+.project-cursor {
+  position: absolute;
+  top: var(--cursor-y, 50%);
+  left: var(--cursor-x, 50%);
+  transform: translate(-50%, -50%) scale(0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 2;
+}
+
+.project-thumb:hover .project-cursor {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.project-cursor-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  color: var(--color-white);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.project-cursor-label {
+  padding: 0.55em 1.1em;
+  border-radius: 999px;
+  background: var(--color-white);
+  color: var(--color-black);
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.project-info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.project-info-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.project-title {
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 1.8vw, 1.9rem);
+  color: var(--color-black);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e2e2e2;
+}
+
+.project-desc {
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: 1;
+  font-weight: 300;
+  font-size: 16px;
+  color: #181818;
+  max-width: 42ch;
+}
+
+.project-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.project-tag-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7em 1.3em;
+  border: 1px solid #d8d8d8;
+  border-radius: 16px;
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-weight: 400;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  color: #3c3c3c;
+}
+
+.project-tag-badge--type {
+  text-transform: uppercase;
+  color: #313131;
+}
+
+/* ============================================
+   REVEAL (reusable)
+   Drop .reveal on anything that should fade + slide up into place the
+   first time it scrolls into view — js/script.js observes every
+   .reveal element and adds .is-visible once, via IntersectionObserver
+   (no re-triggering on scroll back up). Used on .projects, .pricing
+   and .quote content, plus the FAQ intro/title (not the accordion
+   items themselves — animating their own open/close is enough).
+
+   Siblings that are ALL .reveal (project cards, pricing cards) get a
+   small stagger for free from the nth-child rules below; a lone
+   .reveal (e.g. .pricing-header) just uses its own nth-child(1) = 0s.
+   ============================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal:nth-child(2) { transition-delay: 0.08s; }
+.reveal:nth-child(3) { transition-delay: 0.16s; }
+.reveal:nth-child(4) { transition-delay: 0.24s; }
+.reveal:nth-child(5) { transition-delay: 0.32s; }
+.reveal:nth-child(6) { transition-delay: 0.4s; }
+.reveal:nth-child(7) { transition-delay: 0.48s; }
+
+/* ============================================
+   STACK-PIN (reusable)
+   Drop this on a section's inner wrapper to pin it full-viewport
+   while the outer section's extra height (beyond 100vh) scrolls
+   through — used by .statement to hold the text centered on screen
+   while js/script.js drives the word-by-word fill. No cover/shadow
+   effect here anymore, just the pin.
+
+   How to reuse for a future section that needs the same "hold
+   still while its own scroll-driven effect plays out" behavior:
+     <section class="my-section" style="min-height: 180vh">
+       <div class="my-section-inner stack-pin">
+         ...content...
+       </div>
+     </section>
+   ============================================ */
+
+.stack-pin {
+  position: sticky;
+  top: 0;
+  z-index: var(--stack-z, 1);
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+/* ============================================
+   STATEMENT
+   The extra height beyond 100vh (see .statement) is the runway the
+   scroll listener (js/script.js) uses to reveal .word spans one by
+   one, in reading order, switching each straight from #e5e5e5 to
+   #0a0a0a (no fade, no gradient — a hard per-word cut).
+   ============================================ */
+
+.statement {
+  position: relative;
+  min-height: 220vh;
+}
+
+.statement-inner {
+  --stack-z: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 clamp(24px, 8vw, 160px);
+}
+
+.statement-text {
+  max-width: 1500px;
+  margin: 0 auto;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: clamp(1.8rem, 4.2vw, 3.9rem);
+  line-height: 1.28;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.statement-text .word {
+  color: #e5e5e5;
+}
+
+.statement-text .word.is-filled {
+  color: #0a0a0a;
+}
+
+/* ============================================
+   PRICING
+   ============================================ */
+
+.pricing {
+  max-width: var(--section-max-width);
+  margin: 0 auto;
+  padding: clamp(48px, 8vw, 96px) var(--section-edge-padding) clamp(64px, 8vw, 96px);
+}
+
+.pricing-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+.pricing-title {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+  line-height: 1;
+  color: var(--color-black);
+}
+
+.pricing-note {
+  max-width: 420px;
+  padding-top: 0.4em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  line-height: 1;
+  color: #272727;
+  font: var(--font-display);
+}
+
+.pricing-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--card-gap);
+}
+
+.pricing-card {
+  position: relative;
+  overflow: hidden; /* clips the hover gradient sheen to the rounded corners */
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--card-radius);
+  padding: var(--pricing-card-padding);
+  transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+}
+
+/* Everything inside sits above the ::before hover sheen (z-index: 0). */
+.pricing-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pricing-card--dark {
+  --card-bg: var(--color-black);
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+/* Landing Page is already black, so its hover feedback is a subtle
+   black gradient sheen (a pseudo-element that fades in) instead of a
+   flat color swap. */
+.pricing-card--dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(135deg, #2b2b2b 0%, #000000 65%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.pricing-card--dark:hover::before {
+  opacity: 1;
+}
+
+.pricing-card--light {
+  --card-bg: var(--color-white);
+  background: var(--color-white);
+  color: var(--color-black);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+/* Multi-page inverts to the same solid black Landing Page uses by
+   default — swaps --card-bg too so the price-badge border trick
+   (which fills against --card-bg) keeps matching. */
+.pricing-card--light:hover {
+  --card-bg: var(--color-black);
+  background: var(--color-black);
+  color: var(--color-white);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* The two cards see-saw: hovering the light (Multi-page) card doesn't
+   just turn IT black — the dark (Landing Page) card flips to white at
+   the same time, so there's always exactly one black + one white
+   card. Hovering the dark card on its own just gets the gradient
+   sheen above; it doesn't need to touch its sibling since the light
+   card is already white by default. */
+.pricing-cards:has(.pricing-card--light:hover) .pricing-card--dark {
+  --card-bg: var(--color-white);
+  background: var(--color-white);
+  color: var(--color-black);
+  border-color: rgba(0, 0, 0, 0.07);
+}
+
+.pricing-cards:has(.pricing-card--light:hover) .pricing-card--dark::before {
+  opacity: 0;
+}
+
+.pricing-cards:has(.pricing-card--light:hover) .pricing-card--dark .pricing-badge-deadline {
+  border-color: rgba(0, 0, 0, 0.18);
+  color: var(--color-black);
+}
+
+.pricing-cards:has(.pricing-card--light:hover) .pricing-card--dark .pricing-btn-ask {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: var(--color-black);
+}
+
+.pricing-cards:has(.pricing-card--light:hover) .pricing-card--dark .pricing-btn-buy {
+  background: var(--color-black);
+  color: var(--color-white);
+  animation: none;
+}
+
+.pricing-card-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  margin-bottom: var(--pricing-title-gap);
+}
+
+.pricing-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: var(--pricing-meta-gap);
+}
+
+.pricing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.75em 1.2em;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.pricing-badge-price {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(100deg, var(--gradient-start), var(--gradient-end)) border-box;
+}
+
+.pricing-badge-deadline {
+  font-weight: 500;
+}
+
+.pricing-card--dark .pricing-badge-deadline {
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.pricing-card--light .pricing-badge-deadline {
+  border: 1.5px solid rgba(0, 0, 0, 0.18);
+  color: var(--color-black);
+}
+
+.pricing-card--light:hover .pricing-badge-deadline {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.pricing-list-label {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.8rem;
+  margin-bottom: 18px;
+  opacity: 0.5;
+}
+
+.pricing-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pricing-list-gap);
+  margin-bottom: var(--pricing-actions-gap);
+}
+
+.pricing-list li {
+  display: flex;
+  align-items: center;
+  gap: calc(14px * var(--pricing-list-scale));
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-weight: 400;
+  font-size: calc(1.02rem * var(--pricing-list-scale));
+}
+
+.pricing-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(22px * var(--pricing-list-scale));
+  height: calc(22px * var(--pricing-list-scale));
+  flex-shrink: 0;
+  border: 1.8px solid currentColor;
+  border-radius: 6px;
+}
+
+.pricing-check svg {
+  width: calc(11px * var(--pricing-list-scale));
+  height: calc(11px * var(--pricing-list-scale));
+}
+
+.pricing-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: clamp(8px, 2vw, 16px);
+}
+
+.pricing-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95em 1.4em;
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.pricing-btn-buy {
+  color: var(--color-white);
+}
+
+.pricing-card--light .pricing-btn-buy {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+/* On hover the light card flips to black, so its Buy button borrows
+   the dark card's default gradient-flow look instead of staying a
+   flat black-on-black block. */
+.pricing-card--light:hover .pricing-btn-buy {
+  background: linear-gradient(
+    100deg,
+    var(--gradient-start) 0%,
+    var(--gradient-end) 45%,
+    var(--gradient-start) 100%
+  );
+  background-size: 250% 250%;
+  animation: gradientFlow 6s ease-in-out infinite;
+}
+
+.pricing-card--dark .pricing-btn-ask {
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  color: var(--color-white);
+}
+
+.pricing-card--light .pricing-btn-ask {
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  color: var(--color-black);
+}
+
+.pricing-card--light:hover .pricing-btn-ask {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--color-white);
+}
+
+/* Button-level hover — whichever card it's in, Buy/Ask Question turn
+   solid white on their own hover. Specificity matches the card-hover
+   rules above (2 classes + 1 pseudo-class) and comes after them in
+   the file, so it wins the tie and always has the final say. */
+.pricing-card .pricing-btn:hover {
+  background: var(--color-white);
+  color: var(--color-black);
+  border-color: var(--color-white);
+  animation: none;
+}
+
+/* ============================================
+   FAQ
+   ============================================ */
+
+.faq {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(48px, 8vw, 96px) 64px;
+}
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: 0.85fr 1.4fr;
+  gap: clamp(32px, 5vw, 64px);
+  /* Not align-items: center — that recalculates live off the
+     accordion's height, so .faq-intro would visibly jump every time a
+     question opens/closes, and animating a live-recentered layout on
+     top of the height animation is what caused the stutter on close.
+     align-items: start also happens to be what .faq-intro's
+     position: sticky below needs to stick correctly. */
+  align-items: start;
+}
+
+/* Sticks to the top of the viewport while the accordion on the right
+   (which is taller) scrolls past, then releases once .faq-grid's own
+   bottom edge catches up — sticky can never escape its containing
+   grid row, so it lets go on its own once the questions run out,
+   no scroll-position math needed. */
+.faq-intro {
+  position: sticky;
+  top: var(--faq-sticky-offset);
+}
+
+.faq-icon {
+  display: block;
+  width: clamp(100px, 12vw, 190px);
+  margin-bottom: clamp(24px, 4vw, 48px);
+}
+
+.faq-icon img {
+  display: block;
+  width: 100%;
+  height: auto;
+  
+}
+
+.faq-heading {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  line-height: 1.15;
+  color: var(--color-black);
+  margin-bottom: 16px;
+  
+}
+
+.faq-subtitle {
+  max-width: 300px;
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-weight: 400;
+  font-size: 18px;
+  color: #5c5c5c;
+}
+
+.faq-title {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: clamp(2.2rem, 4vw, 3.6rem);
+  line-height: 1;
+  color: var(--color-black);
+  margin-bottom: clamp(24px, 4vw, 40px);
+}
+
+.faq-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faq-item {
+  border: 1px solid #e2e2e2;
+  border-radius: 20px;
+  padding: calc(22px * var(--faq-scale)) calc(28px * var(--faq-scale));
+}
+
+.faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(24px * var(--faq-scale));
+  list-style: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-weight: 400;
+  font-size: calc(clamp(1rem, 1.4vw, 1.15rem) * var(--faq-scale));
+  color: var(--color-black);
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item .chevron {
+  flex-shrink: 0;
+  width: calc(16px * var(--faq-scale));
+  height: calc(16px * var(--faq-scale));
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq-item.is-open .chevron {
+  transform: rotate(180deg);
+}
+
+.faq-answer {
+  margin-top: calc(16px * var(--faq-scale));
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-weight: 400;
+  font-size: calc(0.98rem * var(--faq-scale));
+  color: #6f6f6f;
+}
+
+/* ============================================
+   QUOTE
+   ============================================ */
+
+.quote {
+  /* extra height beyond 100vh = runway .quote-inner (.stack-pin) holds
+     still across while .finale rides up over it, reveal-style — see
+     .stack-pin above for how the mechanic works */
+  position: relative;
+  min-height: 140vh;
+}
+
+.quote-inner {
+  --stack-z: 4;
+}
+
+.quote-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(40px, 7vw, 96px) 64px clamp(64px, 10vw, 140px);
+}
+
+.quote-text {
+  max-width: 1200px;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: clamp(1.8rem, 3.6vw, 3.4rem);
+  line-height: 1;
+  color: var(--color-black);
+}
+
+.quote-text .muted {
+  color: var(--color-muted);
+}
+
+.quote-note {
+  max-width: 1100px;
+  margin-top: clamp(24px, 3vw, 40px);
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3.4vw, 2rem);
+  line-height: 1;
+  color: var(--color-black);
+}
+
+.quote-divider {
+  width: 320px;
+  max-width: 100%;
+  margin: clamp(20px, 2.5vw, 32px) 0 20px;
+  border: none;
+  border-top: 1px solid #e2e2e2;
+}
+
+.quote-signature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  text-transform: uppercase;
+  font-size: 16px;
+}
+
+.quote-name {
+  font-weight: 400;
+  color: var(--color-black);
+}
+
+.quote-sep,
+.quote-role {
+  color: #a3a3a3;
+  font-weight: 400;
+}
+
+/* ============================================
+   FINALE (marquee + CTA + footer)
+   Sits right after .quote in the DOM with no gap, so as it scrolls
+   up from below it naturally rides over the pinned .quote-inner
+   (--stack-z: 4) — the "reveal" effect from reliquia.studio: the
+   quote holds still, this section slides up and opens over it.
+   ============================================ */
+
+.finale {
+  position: relative;
+  z-index: 5;
+  background: var(--color-black);
+  /* The dock nav now fully hides itself over this section (see
+     body.dock-on-dark in this file / js/script.js), so this no longer
+     needs to clear var(--dock-height) — just a bit of breathing room
+     down to the true bottom edge. */
+  padding-bottom: 48px;
+}
+
+.marquee {
+  overflow: hidden;
+  background: #1c1c1c;
+  border-bottom: 1px solid rgba(140, 140, 140, 0.35);
+}
+
+.marquee-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: marquee-scroll 26s linear infinite;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.marquee-item {
+  padding: 20px 40px;
+  white-space: nowrap;
+  
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: clamp(1rem, 1.6vw, 1.3rem);
+  color: var(--color-white);
+}
+
+.marquee-logo {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--color-white);
+}
+
+.marquee-logo img {
+  display: block;
+  width: 26px;
+  height: auto;
+}
+
+.cta {
+  text-align: center;
+  padding: clamp(40px, 6vw, 72px) 24px clamp(32px, 4vw, 48px);
+}
+
+.cta-heading {
+  max-width: 1300px;
+  margin: 0 auto clamp(24px, 3vw, 36px);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: clamp(2rem, 5.2vw, 4.6rem);
+  line-height: 1;
+  color: var(--color-white);
+}
+
+.cta-heading .dim {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 1.1em 2em;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-weight: 400;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  color: var(--color-white);
+}
+
+.site-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(24px, 3vw, 40px) 64px 40px;
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-white);
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 1.3rem;
+}
+
+.footer-logo img {
+  display: block;
+  width: 30px;
+  height: auto;
+}
+
+.footer-privacy {
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-size: 0.95rem;
+}
+
+.footer-contact {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.footer-socials {
+  display: flex;
+  gap: 14px;
+}
+
+.footer-socials a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.75);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.footer-socials a:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--color-white);
+}
+
+.footer-email {
+  color: var(--color-white);
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 1.15rem;
+}
+
+/* ============================================
+   DOCK NAV (fixed / sticky bottom header)
+   ============================================ */
+
+.dock-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 3vw, 48px);
+
+  height: var(--dock-height);
+  padding: 8px 8px 8px 28px;
+  border-radius: 999px;
+  background: #141414;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.dock-logo {
+  display: flex;
+  align-items: center;
+  color: var(--color-white);
+}
+
+.dock-logo img {
+  display: block;
+  width: 28px;
+  height: auto;
+}
+
+.dock-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.4vw, 34px);
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-weight: 400;
+  font-size: 1rem;
+  color: #e7e7e7;
+}
+
+.dock-links a {
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.dock-links a:hover {
+  opacity: 1;
+}
+
+.dock-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  padding: 0 26px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-weight: 400;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  color: var(--color-white);
+}
+
+.dock-cta .arrow {
+  flex-shrink: 0;
+}
+
+/* Hamburger — mobile only (see the ≤640px block below for display:
+   flex). Opens .mobile-nav, the phone-sized stand-in for .dock-links
+   which gets hidden at that width. */
+.dock-burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-white);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dock-burger:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mobile-nav {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--dock-height) + 36px);
+  z-index: 999; /* just under .dock-nav so it reads as tucked behind it */
+  transform: translateX(-50%) translateY(12px);
+  flex-direction: column;
+  gap: 4px;
+  width: calc(100% - 24px);
+  max-width: 360px;
+  padding: 10px;
+  border-radius: 24px;
+  background: #141414;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.mobile-nav.is-open {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.mobile-nav a {
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-weight: 400;
+  font-size: 1.05rem;
+  color: var(--color-white);
+  transition: background 0.2s ease;
+}
+
+.mobile-nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* While the dock nav overlaps the black .cta block (see js/script.js),
+   swap the gradient for a plain white pill so it reads against the
+   dark section; everywhere else it stays the default gradient-flow. */
+.dock-nav.on-dark .dock-cta {
+  background: var(--color-white);
+  color: var(--color-black);
+  animation: none;
+}
+
+/* Side contacts flanking the dock nav — email on the left, socials on
+   the right. Fixed at the same height as the dock nav itself, and
+   hidden together with the whole header (via body.dock-on-dark,
+   toggled in js/script.js using the same overlap check as
+   .dock-nav.on-dark) once the footer — which already shows this same
+   nav/contact info — scrolls underneath, so nothing's duplicated on
+   screen. */
+.dock-side {
+  position: fixed;
+  bottom: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  height: var(--dock-height);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.dock-side-left {
+  left: clamp(16px, 3vw, 40px);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--color-black);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.dock-side-right {
+  right: clamp(16px, 3vw, 40px);
+  gap: 10px;
+}
+
+.dock-side-right a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #141414;
+  color: rgba(255, 255, 255, 0.8);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.dock-side-right a:hover {
+  background: #1f1f1f;
+  color: var(--color-white);
+}
+
+body.dock-on-dark .dock-nav,
+body.dock-on-dark .dock-side {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+/* .dock-nav also gets translateX(-50%) from its own rule above; the
+   two transforms don't combine through this selector alone, so pin
+   the centering back on top of the fade-out offset specifically for
+   the nav. */
+body.dock-on-dark .dock-nav {
+  transform: translateX(-50%) translateY(8px);
+}
+
+/* ============================================
+   CONTACT MODAL
+   Opened by any [data-open-contact] trigger (dock-cta, cta-button —
+   see js/script.js), closed via [data-close-contact], the backdrop,
+   or Escape. Kept in the DOM always and toggled with opacity/
+   visibility (not display) so the panel's own transition can run.
+   ============================================ */
+
+/* Measured with a frame-timing probe (rAF deltas while opening):
+   ~40ms/frame normally, dropping to ~18ms/frame with the backdrop's
+   own blur removed — that's the dominant cost, not the panel's
+   transition. Backdrop-filter has to recomposite every frame
+   anything behind it changes, and it was stacking with the hero
+   badges' own blur(40px) glass (see .badge) plus the page's running
+   gradient-sweep/marquee animations. Since all of that is fully
+   hidden behind the backdrop while the modal is open anyway, both
+   get neutralized for free with zero visual difference:
+   - badges lose their blur (invisible behind the backdrop regardless)
+   - the gradient/marquee animations pause (nothing to see there either)
+   The backdrop's own blur radius is also cut further below. */
+body.modal-open .badge {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body.modal-open .gradient-flow,
+body.modal-open .gradient-text,
+body.modal-open .marquee-track {
+  animation-play-state: paused;
+}
+
+.contact-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.contact-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.contact-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.contact-modal-panel {
+  position: relative;
+  width: min(92vw, 520px);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--color-white);
+  border-radius: var(--card-radius);
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.35);
+  transform: translateY(24px) scale(0.98);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contact-modal.is-open .contact-modal-panel {
+  transform: translateY(0) scale(1);
+}
+
+.contact-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--color-black);
+  transition: background 0.2s ease;
+}
+
+.contact-modal-close:hover {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.contact-modal-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(28px, 4vw, 56px);
+}
+
+.contact-modal-heading {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  line-height: 1;
+  color: var(--color-black);
+}
+
+.contact-modal-subtitle {
+  margin-top: 14px;
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-size: 1.05rem;
+  color: #6f6f6f;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: clamp(24px, 3vw, 36px);
+}
+
+.contact-input {
+  width: 100%;
+  border: none;
+  border-radius: 16px;
+  padding: 1.1em 1.3em;
+  background: var(--color-bg);
+  color: var(--color-black);
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-size: 1rem;
+}
+
+.contact-input::placeholder {
+  color: #9a9a9a;
+}
+
+.contact-textarea {
+  min-height: 128px;
+  resize: vertical;
+  font-family: var(--font-body);
+}
+
+.contact-submit {
+  margin-top: 8px;
+  width: 100%;
+  padding: 1.1em;
+  border-radius: 16px;
+  background: var(--color-black);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1.05rem;
+  transition: background 0.4s ease, transform 0.2s ease;
+}
+
+.contact-submit:hover {
+  background: linear-gradient(
+    100deg,
+    var(--gradient-start) 0%,
+    var(--gradient-end) 45%,
+    var(--gradient-start) 100%
+  );
+  background-size: 250% 250%;
+  animation: gradientFlow 6s ease-in-out infinite;
+  color: var(--color-white);
+  transform: scale(1.03);
+}
+
+/* ============================================
+   PRELOADER
+   Full-screen word-cycling splash, shown once on the initial page
+   load only (see js/script.js — a plain script that runs on load,
+   never on in-page #anchor navigation, so this never replays).
+   ============================================ */
+
+body.preloader-active {
+  overflow: hidden;
+}
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 1500; /* above .dock-nav (1000); the contact modal (2000)
+                    can't be open this early, so no conflict there */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-black);
+  transform: translateY(0);
+  transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.preloader.is-hiding {
+  transform: translateY(-100%);
+}
+
+.preloader.is-done {
+  display: none;
+}
+
+.preloader-word {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  line-height: 1;
+  color: var(--color-white);
+}
+
+
+/* ============================================
+   RESPONSIVE
+   All @media rules gathered here in one place, grouped by
+   breakpoint (descending width), instead of scattered next to
+   each section.
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .hero-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-note {
+    max-width: 100%;
+    margin-bottom: 0;
+  }
+
+  .badge-1 { left: 1%; }
+  .badge-2 { right: 1%; }
+}
+
+@media (max-width: 900px) {
+  .pricing-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-note {
+    max-width: 100%;
+  }
+
+  .faq {
+    padding: 48px 24px;
+  }
+
+  .faq-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .projects {
+    padding: 24px;
+  }
+
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-info {
+    flex-direction: column;
+  }
+
+  .project-tags {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --dock-height: 64px;
+
+    /* ====== MOBILE HERO CONTROL PANEL ======
+       Edit these to resize/reposition the hero section on phones —
+       nothing else in this file needs to change.
+    */
+    --mh-pin-padding-top: 76px;      /* space above hero, clears the fixed top bar */
+
+    --mh-headline-size: 35vw;        /* "AONIX STUDIO" text size */
+    --mh-headline-line-height: 0.9; /* gap between the two wrapped lines */
+
+    --mh-badge-padding: 1em 2em; /* size of the badge pills */
+    --mh-badge-font-size: 0.78rem;    /* text size inside the badges */
+    --mh-hero-side-padding: 24px;    /* left/right inset of the badge row, matches the text above */
+    --mh-badge-row-gap: 20px;        /* space between the subtitle and the badges */
+    --mh-badge-gap: 17px;            /* space between the two badges */
+
+    --mh-heading-size: 1.9rem;       /* "We design websites..." H1 */
+    --mh-heading-line-height: 0.9;
+    --mh-heading-gap: 15px;          /* space above the H1 */
+
+    --mh-note-size: 14px;            /* small paragraph under the H1 */
+    --mh-note-gap: 5px;             /* space above the note */
+
+    /* ====== MOBILE PROJECTS CONTROL PANEL ====== */
+    --mp-title-size: 1.4rem;   /* project card title, e.g. "Xionik - Digital" */
+    --mp-desc-size: 16px;      /* project description paragraph */
+    --mp-tag-size: 0.85rem;    /* type/niche tag badges (e.g. "LANDING PAGE") */
+    --mp-card-gap: 40px;       /* space between stacked project cards */
+
+    /* ====== MOBILE PRICING CONTROL PANEL ====== */
+    --mpr-title-size: 2.2rem;      /* "Pricing for our services" */
+    --mpr-note-size: 0.85rem;      /* note next to the pricing heading */
+    --mpr-card-title-size: 1.8rem; /* "Landing Page" / "Multi-page website" */
+    --mpr-badge-size: 1rem;        /* price + deadline badges */
+    --mpr-list-scale: 1;           /* overrides --pricing-list-scale on mobile (desktop: 1.2) */
+    --mpr-btn-size: 1rem;          /* Buy this service / Ask Question buttons */
+
+    /* ====== MOBILE FAQ CONTROL PANEL ====== */
+    --mf-scale: 1;            /* overrides --faq-scale on mobile (desktop: 1.3) */
+    --mf-icon-size: 90px;     /* question-mark glass icon */
+    --mf-heading-size: 1.8rem;   /* "Frequently Asked Questions" */
+    --mf-subtitle-size: 15px;    /* line under that heading */
+    --mf-title-size: 2.2rem;     /* "Still Have Questions?" */
+
+    /* ====== MOBILE QUOTE CONTROL PANEL ====== */
+    --mq-text-size: 1.8rem;      /* main "Looking good is 10%..." quote */
+    --mq-note-size: 1.6rem;      /* quote follow-up line */
+    --mq-signature-size: 15px;   /* name / role line */
+
+    /* ====== MOBILE CTA + FOOTER CONTROL PANEL ====== */
+    --mc-heading-size: 2rem;     /* black CTA section heading */
+    --mc-button-size: 0.95rem;   /* "Contact us" button in the CTA block */
+    --mc-marquee-size: 1rem;     /* scrolling marquee text */
+    --mft-logo-size: 1.15rem;    /* footer logo wordmark */
+    --mft-email-size: 1.05rem;   /* footer email link */
+    --mft-privacy-size: 0.85rem; /* footer privacy line */
+
+    /* ====== MOBILE NAV CONTROL PANEL ====== */
+    --mn-link-size: 1.05rem;  /* links inside the hamburger dropdown */
+
+    /* ====== MOBILE SECTION SPACING CONTROL PANEL ======
+       Top/bottom padding of each section — this is what sets the gap
+       between e.g. Projects and Pricing (Projects' own bottom value +
+       Pricing's own top value). --ms-side-padding is the shared
+       left/right inset all of them use.
+    */
+    --ms-side-padding: 24px;
+
+    --ms-projects-top: 100px;
+    --ms-projects-bottom: 24px;
+
+    --ms-pricing-top: 48px;
+    --ms-pricing-bottom: 64px;
+
+    --ms-faq-top: 48px;
+    --ms-faq-bottom: 48px;
+
+    --ms-quote-top: 40px;
+    --ms-quote-bottom: 96px;
+
+    --ms-cta-top: 40px;
+    --ms-cta-bottom: 32px;
+
+    --ms-footer-top: 32px;
+    --ms-footer-bottom: 32px;
+
+    /* Shared knobs (declared up top) — overridden here for tighter
+       mobile spacing, same variables the desktop rules already read. */
+    --card-gap: var(--mp-card-gap);
+    --faq-scale: var(--mf-scale);
+    --pricing-list-scale: var(--mpr-list-scale);
+  }
+
+  .projects {
+    padding: var(--ms-projects-top) var(--ms-side-padding) var(--ms-projects-bottom);
+  }
+
+  .pricing {
+    padding: var(--ms-pricing-top) var(--ms-side-padding) var(--ms-pricing-bottom);
+  }
+
+  .pricing-title {
+    font-size: var(--mpr-title-size);
+  }
+
+  .pricing-note {
+    font-size: var(--mpr-note-size);
+  }
+
+  .pricing-card-title {
+    font-size: var(--mpr-card-title-size);
+  }
+
+  .pricing-badge {
+    font-size: var(--mpr-badge-size);
+  }
+
+  .pricing-btn {
+    font-size: var(--mpr-btn-size);
+  }
+
+  .pricing-actions {
+    flex-direction: column;
+  }
+
+  .project-title {
+    font-size: var(--mp-title-size);
+  }
+
+  .project-desc {
+    font-size: var(--mp-desc-size);
+  }
+
+  .project-tag-badge {
+    font-size: var(--mp-tag-size);
+  }
+
+  .faq {
+    padding: var(--ms-faq-top) var(--ms-side-padding) var(--ms-faq-bottom);
+  }
+
+  /* Left column (glass question-mark icon + "Frequently Asked
+     Questions" + subtitle) is desktop-only — on phones it's just the
+     "Still Have Questions?" title + accordion, so .faq-intro's
+     position: sticky (which is what drove the scroll-follow effect)
+     never comes into play either. */
+  .faq-intro {
+    display: none;
+  }
+
+  .faq-title {
+    font-size: var(--mf-title-size);
+  }
+
+  .quote-content {
+    padding: var(--ms-quote-top) var(--ms-side-padding) var(--ms-quote-bottom);
+  }
+
+  .quote-text {
+    font-size: var(--mq-text-size);
+  }
+
+  .quote-note {
+    font-size: var(--mq-note-size);
+  }
+
+  .quote-signature {
+    font-size: var(--mq-signature-size);
+  }
+
+  .cta {
+    padding: var(--ms-cta-top) var(--ms-side-padding) var(--ms-cta-bottom);
+  }
+
+  .cta-heading {
+    font-size: var(--mc-heading-size);
+  }
+
+  .cta-button {
+    font-size: var(--mc-button-size);
+  }
+
+  .marquee-item {
+    font-size: var(--mc-marquee-size);
+  }
+
+  .site-footer {
+    padding: var(--ms-footer-top) var(--ms-side-padding) var(--ms-footer-bottom);
+    align-items: flex-start;
+  }
+
+  .footer-contact {
+    align-items: flex-start;
+  }
+
+  .footer-logo {
+    font-size: var(--mft-logo-size);
+  }
+
+  .footer-email {
+    font-size: var(--mft-email-size);
+  }
+
+  .footer-privacy {
+    font-size: var(--mft-privacy-size);
+  }
+
+  .dock-side {
+    top: 16px;
+    bottom: auto;
+    height: auto;
+  }
+
+  .dock-side-right a {
+    width: 34px;
+    height: 34px;
+  }
+
+  .mobile-nav a {
+    font-size: var(--mn-link-size);
+  }
+
+  .hero-pin {
+    padding-top: var(--mh-pin-padding-top);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .hero-headline {
+    order: 1;
+    flex: 0 0 100%;
+    text-align: center;
+    white-space: normal;
+    margin-top: 0;
+    top: 0;
+  }
+
+  .hero-headline .line {
+    font-size: var(--mh-headline-size);
+    line-height: var(--mh-headline-line-height);
+  }
+
+  .hero-content {
+    order: 2;
+    flex: 0 0 100%;
+    align-items: stretch;
+    margin: 0;
+  }
+
+  .hero-heading {
+    transform: none;
+    font-size: var(--mh-heading-size);
+    line-height: var(--mh-heading-line-height);
+    max-width: none;
+    margin-top: var(--mh-heading-gap);
+  }
+
+  .hero-note {
+    max-width: none;
+    font-size: var(--mh-note-size);
+    margin-top: var(--mh-note-gap);
+    margin-bottom: 0;
+  }
+
+  /* Badges leave the headline and drop into normal flow, in a row
+     right after the subtitle — same glass look, just repositioned. */
+  .badge {
+    padding: var(--mh-badge-padding);
+    font-size: var(--mh-badge-font-size);
+  }
+
+  .badge-1,
+  .badge-2 {
+    position: static;
+    order: 3;
+    transform: none;
+    margin-top: var(--mh-badge-row-gap);
+  }
+
+  .badge-1 {
+    margin-left: var(--mh-hero-side-padding);
+    margin-right: var(--mh-badge-gap);
+  }
+
+  .badge-2 {
+    margin-right: var(--mh-hero-side-padding);
+  }
+
+  .dock-nav {
+    width: calc(100% - 24px);
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 6px 6px 18px;
+  }
+
+  .dock-burger {
+    display: flex;
+  }
+
+  .mobile-nav {
+    display: flex;
+  }
+
+  .dock-links {
+    display: none;
+  }
+
+  .dock-cta {
+    padding: 0 20px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .preloader {
+    transition: none;
+  }
+}
