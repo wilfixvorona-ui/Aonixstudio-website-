@@ -1,20 +1,20 @@
 /* ============================================
    FONTS
+   All four are loaded via Google Fonts — see the <link> in
+   index.html's <head> (right after the fonts.g* preconnects), not an
+   @import here, so the browser can start fetching them the moment the
+   HTML is parsed instead of waiting on style.css. Works on any
+   device, not just ones with the fonts installed locally.
 
-   Anton      — Google Fonts (confirmed)
-   Bricolage Grotesque — Google Fonts (confirmed), the main body font.
-   Every element using var(--font-body) also gets the tracking/leading
-   pair below (--font-body-tracking / --font-body-leading) so the look
-   stays consistent wherever the font is used.
-   SUSE Mono  — Google Fonts, a second accent/mono style — use
-   var(--font-mono) or class .font-mono wherever it's wanted
-   Stack Sans Notch (Light) — NOT confirmed on Google Fonts yet.
-   Poppins Light is used as a temporary stand-in below so the
-   layout reads correctly. Send the real Fonts link / files and
-   this block gets swapped, nothing else in the file changes.
+   Anton               — display font (headline)
+   Bricolage Grotesque — main body font. Every element using
+                          var(--font-body) also gets the
+                          tracking/leading pair below
+                          (--font-body-tracking / --font-body-leading)
+                          so the look stays consistent wherever it's used.
+   Stack Sans Notch    — heading font (var(--font-heading))
+   SUSE Mono           — accent/mono style, var(--font-mono) or .font-mono
    ============================================ */
-
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Poppins:wght@300;400;500;700&family=SUSE+Mono:wght@400;500;600;700&display=swap');
 
 :root {
   --color-black: #0a0a0a;
@@ -27,7 +27,7 @@
   --gradient-end: #8D36FF;
 
   --font-display: 'Anton', sans-serif;
-  --font-heading: 'Stack Sans Notch', 'Poppins', sans-serif;
+  --font-heading: 'Stack Sans Notch', sans-serif;
   --font-body: 'Bricolage Grotesque', sans-serif;
   --font-body-tracking: -0.06em;
   --font-body-leading: 1;
