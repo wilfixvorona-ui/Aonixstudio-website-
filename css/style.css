@@ -1919,6 +1919,7 @@ body.preloader-active {
   }
 
   .footer-email {
+    padding: 11px 0;
     font-size: var(--mft-email-size);
   }
 
@@ -1930,6 +1931,14 @@ body.preloader-active {
     top: 16px;
     bottom: auto;
     height: auto;
+  }
+
+  /* .dock-side collapses to height: auto right above, which would
+     otherwise shrink the email link's tap target down to just its
+     text line (~18px) — pad it back out to a thumb-friendly ~44px
+     without shifting where the text sits (vertical padding only). */
+  .dock-side-left {
+    padding: 13px 0;
   }
 
   /* Backdrop behind the top email/social row so the hero content

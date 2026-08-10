@@ -353,7 +353,7 @@
       const message = form.message.value.trim();
       const subject = encodeURIComponent(`New inquiry from ${name || 'your website'}`);
       const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
-      window.location.href = `mailto:hello@aonix.studio?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:hello@aonixstudio.com?subject=${subject}&body=${body}`;
       closeModal();
       form.reset();
     });
