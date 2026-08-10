@@ -1742,6 +1742,14 @@ body.preloader-active {
     /* ====== MOBILE NAV CONTROL PANEL ====== */
     --mn-link-size: 1.05rem;  /* links inside the hamburger dropdown */
 
+    /* ====== MOBILE STATEMENT CONTROL PANEL ======
+       The "Looking good is 10% of the job..." scroll-fill text right
+       after Projects. */
+    --mst-text-size: 2rem;
+    --mst-line-height: 1.1;
+    --mst-letter-spacing: -0.01em;
+    --mst-side-padding: 24px;
+
     /* ====== MOBILE SECTION SPACING CONTROL PANEL ======
        Top/bottom padding of each section — this is what sets the gap
        between e.g. Projects and Pricing (Projects' own bottom value +
@@ -1834,6 +1842,33 @@ body.preloader-active {
 
   .faq-title {
     font-size: var(--mf-title-size);
+  }
+
+  .statement-inner {
+    padding: 0 var(--mst-side-padding);
+  }
+
+  .statement-text {
+    font-size: var(--mst-text-size);
+    line-height: var(--mst-line-height);
+    letter-spacing: var(--mst-letter-spacing);
+  }
+
+  /* Desktop pins .quote-inner in place (position: sticky, see
+     .stack-pin) while .finale — the marquee/CTA/footer block right
+     after it in the DOM — scrolls up and rides over it, "revealing"
+     itself. On phones that just reads as jank, so the pin is switched
+     off here: .quote-inner scrolls away normally like everything
+     else, and .quote's extra 140vh of pin runway collapses back down
+     to its own content height. Desktop is untouched — this only
+     exists inside this ≤640px block. */
+  .quote {
+    min-height: auto;
+  }
+
+  .quote-inner {
+    position: static;
+    min-height: auto;
   }
 
   .quote-content {
