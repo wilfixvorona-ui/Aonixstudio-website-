@@ -174,7 +174,6 @@ a {
   border: 1px solid rgba(255, 255, 255, 0.22);
 
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.22),
     inset 0 1px 1px rgba(255, 255, 255, 0.28),
     inset 0 -1px 2px rgba(0, 0, 0, 0.2);
 
@@ -1691,11 +1690,12 @@ body.preloader-active {
 
     --mh-headline-size: 35vw;        /* "AONIX STUDIO" text size */
     --mh-headline-line-height: 0.9; /* gap between the two wrapped lines */
+    --mh-headline-gap: 40px;         /* space above "AONIX STUDIO", now that it sits below the badges */
 
     --mh-badge-padding: 1em 2em; /* size of the badge pills */
-    --mh-badge-font-size: 0.78rem;    /* text size inside the badges */
+    --mh-badge-font-size: 0.9rem;    /* text size inside the badges */
     --mh-hero-side-padding: 24px;    /* left/right inset of the badge row, matches the text above */
-    --mh-badge-row-gap: 20px;        /* space between the subtitle and the badges */
+    --mh-badge-row-gap: 24px;        /* space between the subtitle and the badges */
     --mh-badge-gap: 17px;            /* space between the two badges */
 
     --mh-heading-size: 1.9rem;       /* "We design websites..." H1 */
@@ -1704,6 +1704,7 @@ body.preloader-active {
 
     --mh-note-size: 14px;            /* small paragraph under the H1 */
     --mh-note-gap: 5px;             /* space above the note */
+    --mh-note-width: 62%;            /* how narrow the subtitle column is, now that it's shifted to the right */
 
     /* ====== MOBILE PROJECTS CONTROL PANEL ====== */
     --mp-title-size: 1.4rem;   /* project card title, e.g. "Xionik - Digital" */
@@ -1746,7 +1747,8 @@ body.preloader-active {
        The "Looking good is 10% of the job..." scroll-fill text right
        after Projects. */
     --mst-text-size: 2rem;
-    --mst-line-height: 1.1;
+    --mst-line-height: 1.1
+    ;
     --mst-letter-spacing: -0.01em;
     --mst-side-padding: 24px;
 
@@ -1930,6 +1932,22 @@ body.preloader-active {
     height: auto;
   }
 
+  /* Backdrop behind the top email/social row so the hero content
+     (headline, "AONIX STUDIO") doesn't visually collide with it as it
+     scrolls up underneath — .dock-side stays fixed. Matches the page
+     background so it blends in rather than reading as a white bar. */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: var(--color-bg);
+    z-index: 900;
+    pointer-events: none;
+  }
+
   .dock-side-right a {
     width: 34px;
     height: 34px;
@@ -1947,11 +1965,11 @@ body.preloader-active {
   }
 
   .hero-headline {
-    order: 1;
+    order: 3;
     flex: 0 0 100%;
     text-align: center;
     white-space: normal;
-    margin-top: 0;
+    margin-top: var(--mh-headline-gap);
     top: 0;
   }
 
@@ -1961,7 +1979,7 @@ body.preloader-active {
   }
 
   .hero-content {
-    order: 2;
+    order: 1;
     flex: 0 0 100%;
     align-items: stretch;
     margin: 0;
@@ -1976,7 +1994,9 @@ body.preloader-active {
   }
 
   .hero-note {
-    max-width: none;
+    align-self: flex-end;
+    max-width: var(--mh-note-width);
+    text-align: left;
     font-size: var(--mh-note-size);
     margin-top: var(--mh-note-gap);
     margin-bottom: 0;
@@ -1992,7 +2012,7 @@ body.preloader-active {
   .badge-1,
   .badge-2 {
     position: static;
-    order: 3;
+    order: 2;
     transform: none;
     margin-top: var(--mh-badge-row-gap);
   }
