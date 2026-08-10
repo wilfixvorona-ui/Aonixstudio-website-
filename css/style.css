@@ -56,6 +56,17 @@
   --faq-sticky-offset: clamp(24px, 4vw, 48px); /* gap from the viewport top while .faq-intro is stuck */
 
   --dock-height: 76px;
+
+  /* Telegram/WhatsApp icons — header (dock-side-right) and footer
+     (footer-socials) each get their own knobs for the round button
+     and the icon graphic inside it, so resizing one place never
+     affects the other. Desktop values live here; the ≤640px block
+     redefines the same names with its own values (same pattern as
+     --dock-height above) — nothing else needs to change. */
+  --social-btn-size-header: 40px;
+  --social-icon-size-header: 40px;
+  --social-btn-size-footer: 40px;
+  --social-icon-size-footer: 18px;
 }
 
 * {
@@ -1174,12 +1185,19 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: var(--social-btn-size-footer);
+  height: var(--social-btn-size-footer);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.75);
   transition: background 0.2s ease, color 0.2s ease;
+}
+
+.footer-socials a img {
+  display: block;
+  width: var(--social-icon-size-footer);
+  height: var(--social-icon-size-footer);
+  object-fit: contain;
 }
 
 .footer-socials a:hover {
@@ -1378,16 +1396,22 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #141414;
+  width: var(--social-btn-size-header);
+  height: var(--social-btn-size-header);
   color: rgba(255, 255, 255, 0.8);
-  transition: background 0.2s ease, color 0.2s ease;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.dock-side-right a img {
+  display: block;
+  width: var(--social-icon-size-header);
+  height: var(--social-icon-size-header);
+  object-fit: contain;
 }
 
 .dock-side-right a:hover {
-  background: #1f1f1f;
+  opacity: 1;
   color: var(--color-white);
 }
 
@@ -1682,6 +1706,14 @@ body.preloader-active {
   :root {
     --dock-height: 64px;
 
+    /* ====== MOBILE SOCIAL ICONS CONTROL PANEL ======
+       Same knobs as the desktop ones at the top of the file, redefined
+       here for phones — independent from the desktop values above. */
+    --social-btn-size-header: 32px;
+    --social-icon-size-header: 30px;
+    --social-btn-size-footer: 40px;
+    --social-icon-size-footer: 18px;
+
     /* ====== MOBILE HERO CONTROL PANEL ======
        Edit these to resize/reposition the hero section on phones —
        nothing else in this file needs to change.
@@ -1693,10 +1725,10 @@ body.preloader-active {
     --mh-headline-gap: 40px;         /* space above "AONIX STUDIO", now that it sits below the badges */
 
     --mh-badge-padding: 1em 2em; /* size of the badge pills */
-    --mh-badge-font-size: 0.9rem;    /* text size inside the badges */
+    --mh-badge-font-size: 0.75rem;    /* text size inside the badges */
     --mh-hero-side-padding: 24px;    /* left/right inset of the badge row, matches the text above */
     --mh-badge-row-gap: 24px;        /* space between the subtitle and the badges */
-    --mh-badge-gap: 17px;            /* space between the two badges */
+    --mh-badge-gap: 10px;            /* space between the two badges */
 
     --mh-heading-size: 1.9rem;       /* "We design websites..." H1 */
     --mh-heading-line-height: 0.9;
@@ -1829,6 +1861,18 @@ body.preloader-active {
     font-size: var(--mp-tag-size);
   }
 
+  /* "See the project" cursor-follow badge is a hover effect — there's
+     no hover on touch, so on phones it never fades in on its own
+     (see js/script.js's mousemove listener); it only shows up if a
+     stray touch happens to leave it stuck. Desktop keeps it as-is. */
+  .project-cursor {
+    display: none;
+  }
+
+  .project-thumb {
+    cursor: auto;
+  }
+
   .faq {
     padding: var(--ms-faq-top) var(--ms-side-padding) var(--ms-faq-bottom);
   }
@@ -1935,10 +1979,16 @@ body.preloader-active {
 
   /* .dock-side collapses to height: auto right above, which would
      otherwise shrink the email link's tap target down to just its
-     text line (~18px) — pad it back out to a thumb-friendly ~44px
-     without shifting where the text sits (vertical padding only). */
-  .dock-side-left {
-    padding: 13px 0;
+     text line (~18px). Giving both dock-side-left (email) and
+     dock-side-right (icons) the SAME explicit height — instead of
+     padding just the email link — keeps them centered on the same
+     axis: both start at the same top:16px, so equal heights is what
+     actually keeps the email text and the icons visually aligned
+     (padding-only on one side was taller than the other, which is
+     what pushed the email text down relative to the icons). */
+  .dock-side-left,
+  .dock-side-right {
+    height: 44px;
   }
 
   /* Backdrop behind the top email/social row so the hero content
@@ -1955,11 +2005,6 @@ body.preloader-active {
     background: var(--color-bg);
     z-index: 900;
     pointer-events: none;
-  }
-
-  .dock-side-right a {
-    width: 34px;
-    height: 34px;
   }
 
   .mobile-nav a {

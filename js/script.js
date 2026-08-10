@@ -392,3 +392,35 @@
     if (e.key === 'Escape' && nav.classList.contains('is-open')) setOpen(false);
   });
 })();
+
+// Email links (header + footer): on desktop, clicking mailto: often
+// does nothing visible — plenty of desktop browsers have no mail
+// client registered as the OS default, so the click silently goes
+// nowhere and it just looks broken. Mobile always has one, so it's
+// left untouched there. Desktop gets a copy-to-clipboard + "Copied"
+// text swap alongside the normal mailto: hand-off (no preventDefault
+// — if the user *does* have a mail client, it still opens as usual).
+(function () {
+  const emailLinks = document.querySelectorAll('.dock-side-left, .footer-email');
+  if (!emailLinks.length || !navigator.clipboard) return;
+
+  const isDesktop = () => window.matchMedia('(min-width: 761px)').matches;
+
+  emailLinks.forEach((link) => {
+    const originalText = link.textContent;
+    let resetTimer = null;
+
+    link.addEventListener('click', () => {
+      if (!isDesktop()) return;
+
+      const email = link.href.replace(/^mailto:/, '').split('?')[0];
+      navigator.clipboard.writeText(email).then(() => {
+        clearTimeout(resetTimer);
+        link.textContent = 'Copied ✓';
+        resetTimer = setTimeout(() => {
+          link.textContent = originalText;
+        }, 2000);
+      }).catch(() => {});
+    });
+  });
+})();
