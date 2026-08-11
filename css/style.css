@@ -151,7 +151,17 @@ a {
 }
 
 .hero-headline {
-  display: block;
+  /* flex + justify-content, NOT display:block + text-align — with the
+     "AONIX STUDIO" line wider than the viewport (the bleed effect),
+     text-align: center turned out to only be centering in theory:
+     measured it in DevTools and the entire overflow was landing on
+     the right edge only (left edge sat flush at 0, zero crop) on
+     every width tested. That's what was eating "IO" off "STUDIO" —
+     the right side was taking the whole crop instead of half.
+     justify-content: center splits it evenly on both edges instead. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 0.85;
   font-family: var(--font-display);
   text-transform: uppercase;
