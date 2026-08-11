@@ -57,6 +57,12 @@
 
   --dock-height: 76px;
 
+  /* Horizontal nudge on .hero-heading — see the comment on that rule.
+     -64px is only safe once there's enough spare width; the
+     tablet/small-laptop RESPONSIVE bands below pull this down to
+     something that doesn't clip "We design...". */
+  --hero-heading-shift-x: -64px;
+
   /* Telegram/WhatsApp icons — header (dock-side-right) and footer
      (footer-socials) each get their own knobs for the round button
      and the icon graphic inside it, so resizing one place never
@@ -64,9 +70,9 @@
      redefines the same names with its own values (same pattern as
      --dock-height above) — nothing else needs to change. */
   --social-btn-size-header: 40px;
-  --social-icon-size-header: 40px;
+  --social-icon-size-header: 18px;
   --social-btn-size-footer: 40px;
-  --social-icon-size-footer: 18px;
+  --social-icon-size-footer: 20px;
 }
 
 * {
@@ -139,6 +145,7 @@ a {
 }
 
 .hero-pin {
+  position: relative;  /* badges anchor to this, not .hero — see .badge below */
   padding-top: clamp(24px, 5vw, 64px);
   overflow-x: clip;   /* замість overflow: hidden */
 }
@@ -162,8 +169,15 @@ a {
   top: 30px; /* фіксоване значення, якщо потрібна точність незалежно від ширини */
 }
 
+/* Base/fallback size — the ≥1680px band in RESPONSIVE overrides this
+   with the same curve for that range, so this really only matters
+   for anything wider that band doesn't cover. Every band below uses
+   the same ~22.4vw slope (tuned so the bleed/crop ratio at the edges
+   stays consistent — around 8% of the viewport overflowing offscreen
+   on both sides — instead of one single clamp with a spread so wide
+   it over-crops on tablets and under-crops on big monitors). */
 .hero-headline .line {
-  font-size: clamp(6rem, 28vw, 317px);
+  font-size: clamp(376px, 22.4vw, 470px);
   letter-spacing: -0.01em;
 }
 
@@ -251,8 +265,12 @@ a {
 
   /* Ручне підстроювання позиції: перше число — вправо(+)/вліво(-),
      друге — вниз(+)/вгору(-). Не впливає на .hero-note, бо не займає
-     місце в layout — просто зсуває сам заголовок. */
-  transform: translate(-64px, 32px);
+     місце в layout — просто зсуває сам заголовок.
+     --hero-heading-shift-x is 0 by default (safe everywhere) and only
+     gets pulled negative in the RESPONSIVE bands wide enough to have
+     the spare room — see there for why a flat -64px clipped "We" on
+     tablet/small-laptop widths. */
+  transform: translate(var(--hero-heading-shift-x, 0px), 32px);
 }
 
 .hero-heading .muted {
@@ -1198,6 +1216,10 @@ a {
   width: var(--social-icon-size-footer);
   height: var(--social-icon-size-footer);
   object-fit: contain;
+  /* source files are solid-black glyphs on transparent — flatten to
+     black then invert, so they land on pure white regardless of any
+     anti-aliasing gray in the source, not just "roughly light" */
+  filter: brightness(0) invert(1);
 }
 
 .footer-socials a:hover {
@@ -1398,9 +1420,10 @@ a {
   justify-content: center;
   width: var(--social-btn-size-header);
   height: var(--social-btn-size-header);
+  border-radius: 50%;
+  background: #141414;
   color: rgba(255, 255, 255, 0.8);
-  opacity: 0.85;
-  transition: opacity 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .dock-side-right a img {
@@ -1408,10 +1431,14 @@ a {
   width: var(--social-icon-size-header);
   height: var(--social-icon-size-header);
   object-fit: contain;
+  /* source files are solid-black glyphs on transparent — flatten to
+     black then invert, so they land on pure white regardless of any
+     anti-aliasing gray in the source, not just "roughly light" */
+  filter: brightness(0) invert(1);
 }
 
 .dock-side-right a:hover {
-  opacity: 1;
+  background: #1f1f1f;
   color: var(--color-white);
 }
 
@@ -1651,6 +1678,53 @@ body.preloader-active {
    each section.
    ============================================ */
 
+/* ------------------------------------------------------------
+   Hero headline "bleed" tuning across the tablet/laptop range.
+   Same ~22.4vw slope in every band (so the crop ratio at the edges
+   stays a consistent ~8%, instead of one clamp() with too wide a
+   spread that over-crops on tablets and under-crops on big
+   monitors) — only the clamp's min/max floor and ceiling change per
+   band, each a ≤1.4x spread. ≥1680px is the widest band and also
+   doubles as the base rule's fallback above; ≤640px is the separate
+   mobile hero block further down (untouched, different composition).
+   ------------------------------------------------------------ */
+
+@media (min-width: 1403px) and (max-width: 1679px) {
+  .hero-headline .line {
+    font-size: clamp(314px, 22.4vw, 376px);
+  }
+}
+
+@media (min-width: 1195px) and (max-width: 1402px) {
+  .hero-headline .line {
+    font-size: clamp(268px, 22.4vw, 314px);
+  }
+
+  :root {
+    --hero-heading-shift-x: -24px;
+  }
+}
+
+@media (min-width: 896px) and (max-width: 1194px) {
+  .hero-headline .line {
+    font-size: clamp(200px, 22.4vw, 268px);
+  }
+
+  :root {
+    --hero-heading-shift-x: 0px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 895px) {
+  .hero-headline .line {
+    font-size: clamp(144px, 22.4vw, 200px);
+  }
+
+  :root {
+    --hero-heading-shift-x: 0px;
+  }
+}
+
 @media (max-width: 1024px) {
   .hero-content {
     flex-direction: column;
@@ -1710,9 +1784,9 @@ body.preloader-active {
        Same knobs as the desktop ones at the top of the file, redefined
        here for phones — independent from the desktop values above. */
     --social-btn-size-header: 32px;
-    --social-icon-size-header: 30px;
+    --social-icon-size-header: 18px;
     --social-btn-size-footer: 40px;
-    --social-icon-size-footer: 18px;
+    --social-icon-size-footer: 20px;
 
     /* ====== MOBILE HERO CONTROL PANEL ======
        Edit these to resize/reposition the hero section on phones —
