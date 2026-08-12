@@ -29,7 +29,7 @@
 
   sessionStorage.setItem('preloaderShown', 'true');
 
-  const WORDS = ['Welcome', 'Bienvenido', 'Bienvenue', 'Ласкаво просимо', 'Witamy', 'Vitajte'];
+  const WORDS = ['Welcome', 'Bienvenido', 'Bienvenue', 'Вітаю', 'Witamy', 'Vitajte'];
   const TOTAL_DURATION = 2000;
   const STEP_DURATION = TOTAL_DURATION / WORDS.length;
 

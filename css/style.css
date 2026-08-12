@@ -58,10 +58,15 @@
   --dock-height: 76px;
 
   /* Horizontal nudge on .hero-heading — see the comment on that rule.
-     -64px is only safe once there's enough spare width; the
-     tablet/small-laptop RESPONSIVE bands below pull this down to
-     something that doesn't clip "We design...". */
-  --hero-heading-shift-x: -64px;
+     -32px is the largest pull that still fits inside the smallest
+     side padding this rule ever runs at (56px, the clamp() ceiling on
+     .hero-content) — a flat -64px overflowed past the left edge at
+     EVERY width ≥1403px (the two bands below that point never
+     redeclare it, so they inherited this default), which is what was
+     eating into the edge on MacBook-size screens. The narrower
+     tablet/small-laptop RESPONSIVE bands below still pull this down
+     further (or to 0) where the spare width is tighter still. */
+  --hero-heading-shift-x: -32px;
 
   /* Telegram/WhatsApp icons — header (dock-side-right) and footer
      (footer-socials) each get their own knobs for the round button
@@ -1730,6 +1735,10 @@ body.preloader-active {
   .hero-headline .line {
     font-size: clamp(314px, 22.4vw, 376px);
   }
+
+  :root {
+    --hero-heading-shift-x: -32px;
+  }
 }
 
 @media (min-width: 1195px) and (max-width: 1402px) {
@@ -1759,6 +1768,136 @@ body.preloader-active {
 
   :root {
     --hero-heading-shift-x: 0px;
+  }
+}
+
+/* ------------------------------------------------------------
+   TABLET/IPAD HERO — same reflow idea as the ≤640px mobile hero
+   further down (heading + note first, badges, then the full
+   "AONIX STUDIO" headline last), instead of the desktop composition
+   where the headline bleeds/crops behind the badges. At iPad widths
+   that bleed math (tuned for desktop's spare width) was clipping the
+   headline against the very top of the viewport instead of giving it
+   a deliberate partial crop. Separate control-panel vars from the
+   phone ones (--th- instead of --mh-) since the sizes need to be
+   bigger here.
+   ------------------------------------------------------------ */
+@media (min-width: 641px) and (max-width: 1024px) {
+  :root {
+    --th-pin-padding-top: 96px;   /* space above hero, clears the top email/social bar */
+    --th-side-padding: 40px;      /* left/right inset for heading/note/badges */
+
+    --th-headline-size: 26vw;     /* "AONIX STUDIO" text size */
+    --th-headline-line-height: 0.9;
+    --th-headline-gap: 56px;      /* space above the headline, now that it sits below the badges */
+
+    --th-heading-gap: 0px;        /* space above the H1, right under the top bar */
+    --th-note-width: 60%;         /* how narrow the subtitle column is, shifted to the right */
+    --th-note-gap: 16px;          /* space above the subtitle */
+
+    --th-badge-row-gap: 32px;     /* space between the subtitle and the badges */
+    --th-badge-gap: 16px;         /* space between the two badges */
+  }
+
+  /* Top bar: email + socials move up here instead of sharing the
+     bottom row with the dock-nav pill — same treatment as phones. */
+  .dock-side {
+    top: 24px;
+    bottom: auto;
+    height: auto;
+  }
+
+  .dock-side-left,
+  .dock-side-right {
+    height: 44px;
+  }
+
+  /* Backdrop behind that top bar so hero content scrolling up under
+     it doesn't visually collide — matches the phone version below. */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    background: var(--color-bg);
+    z-index: 900;
+    pointer-events: none;
+  }
+
+  .hero-pin {
+    padding-top: var(--th-pin-padding-top);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .hero-content {
+    order: 1;
+    flex: 0 0 100%;
+    align-items: stretch;
+    margin: 0;
+    padding: 0 var(--th-side-padding);
+  }
+
+  .hero-heading {
+    transform: none;
+    max-width: none;
+    margin-top: var(--th-heading-gap);
+  }
+
+  .hero-note {
+    align-self: flex-end;
+    max-width: var(--th-note-width);
+    text-align: left;
+    margin-top: var(--th-note-gap);
+    margin-bottom: 0;
+  }
+
+  .badge-1,
+  .badge-2 {
+    position: static;
+    order: 2;
+    margin-top: var(--th-badge-row-gap);
+  }
+
+  .badge-1 {
+    margin-left: var(--th-side-padding);
+    margin-right: var(--th-badge-gap);
+  }
+
+  .badge-2 {
+    margin-right: var(--th-side-padding);
+  }
+
+  .hero-headline {
+    order: 3;
+    flex: 0 0 100%;
+    text-align: center;
+    white-space: normal;
+    margin-top: var(--th-headline-gap);
+    top: 0;
+  }
+
+  .hero-headline .line {
+    font-size: var(--th-headline-size);
+    line-height: var(--th-headline-line-height);
+  }
+
+  /* Left column (icon + "Frequently Asked Questions" + subtitle) is
+     desktop-only — same reasoning as the phone block further down:
+     hiding it also switches off its position: sticky, which is what
+     drove the scroll-follow effect. .faq-grid already goes 1-column
+     by 900px elsewhere in this file; redeclared here too so the
+     901-1024px sliver (where that rule hasn't kicked in yet) doesn't
+     leave an empty first grid column behind. */
+  .faq-intro {
+    display: none;
+  }
+
+  .faq-grid {
+    grid-template-columns: 1fr;
   }
 }
 
