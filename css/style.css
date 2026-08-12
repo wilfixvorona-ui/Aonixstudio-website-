@@ -1640,6 +1640,33 @@ body.modal-open .marquee-track {
   transform: scale(1.03);
 }
 
+.contact-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+  animation: none;
+}
+
+/* Reserves its own line height even when empty so the success/error
+   message appearing doesn't shove the rest of the modal down. */
+.contact-form-status {
+  min-height: 1.3em;
+  margin-top: 4px;
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: var(--font-body-leading);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.contact-form-status--success {
+  color: #1a7f37;
+}
+
+.contact-form-status--error {
+  color: #d1002e;
+}
+
 /* ============================================
    PRELOADER
    Full-screen word-cycling splash, shown once on the initial page
@@ -1768,7 +1795,13 @@ body.preloader-active {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 1024px) {
+  /* Was ≤720px — at 768-1024px (tablets) two narrow columns wrap
+     each card's title/description onto many lines, making cards tall
+     enough to run into the floating dock-nav/email pinned at the
+     bottom of the viewport. Single column keeps cards short and
+     readable at tablet widths, same as everywhere else in this file
+     that switches to a tablet-friendly layout at 1024px. */
   .projects {
     padding: 24px;
   }

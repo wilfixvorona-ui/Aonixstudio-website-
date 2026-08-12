@@ -300,9 +300,11 @@
 // Contact modal: opened by every [data-open-contact] trigger (the
 // dock nav's "Contact us" and the CTA section's "Let's talk"),
 // closed via [data-close-contact] (backdrop + X button) or Escape.
-// The form has no backend, so submitting it hands off to the user's
-// email client with the fields pre-filled instead of silently doing
-// nothing.
+// The form posts to Formspree (see form's action= in index.html) —
+// that's also the no-JS fallback, a plain POST that redirects to
+// Formspree's own thank-you page. With JS, the submit below
+// intercepts it and does the same POST via fetch instead, so the
+// result shows inline in the modal without leaving the page.
 (function () {
   const modal = document.getElementById('contact-modal');
   if (!modal) return;
@@ -346,16 +348,43 @@
   });
 
   if (form) {
-    form.addEventListener('submit', (e) => {
+    const submitBtn = form.querySelector('.contact-submit');
+    const statusEl = form.querySelector('[data-form-status]');
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = form.name.value.trim();
-      const email = form.email.value.trim();
-      const message = form.message.value.trim();
-      const subject = encodeURIComponent(`New inquiry from ${name || 'your website'}`);
-      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
-      window.location.href = `mailto:hello@aonixstudio.com?subject=${subject}&body=${body}`;
-      closeModal();
-      form.reset();
+      statusEl.textContent = '';
+      statusEl.classList.remove('contact-form-status--success', 'contact-form-status--error');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending…';
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        });
+
+        if (response.ok) {
+          statusEl.textContent = 'Thanks! We’ll get back to you within 24 hours.';
+          statusEl.classList.add('contact-form-status--success');
+          form.reset();
+          setTimeout(closeModal, 2000);
+        } else {
+          const data = await response.json().catch(() => null);
+          const message = data && data.errors
+            ? data.errors.map((err) => err.message).join(', ')
+            : 'Something went wrong — please try again or email us directly.';
+          statusEl.textContent = message;
+          statusEl.classList.add('contact-form-status--error');
+        }
+      } catch (err) {
+        statusEl.textContent = 'Network error — please check your connection and try again.';
+        statusEl.classList.add('contact-form-status--error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Confirm';
+      }
     });
   }
 })();

@@ -502,11 +502,12 @@
         <h2 id="contact-modal-title" class="contact-modal-heading">Contact us</h2>
         <p class="contact-modal-subtitle">We will write to you within 24 hours.</p>
 
-        <form class="contact-form">
+        <form class="contact-form" action="https://formspree.io/f/xnpadevn" method="POST">
           <input class="contact-input" type="text" name="name" placeholder="What is your name?" autocomplete="name">
           <input class="contact-input" type="email" name="email" placeholder="Your email" autocomplete="email" required>
           <textarea class="contact-input contact-textarea" name="message" placeholder="Message (optional)"></textarea>
           <button type="submit" class="contact-submit">Confirm</button>
+          <p class="contact-form-status" data-form-status aria-live="polite"></p>
         </form>
       </div>
     </div>
