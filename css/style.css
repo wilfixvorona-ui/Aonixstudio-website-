@@ -1200,6 +1200,11 @@ a {
   letter-spacing: var(--font-body-tracking);
   line-height: var(--font-body-leading);
   font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.footer-privacy:hover {
+  color: var(--color-white);
 }
 
 .footer-contact {
@@ -2370,5 +2375,100 @@ body.preloader-active {
 
   .preloader {
     transition: none;
+  }
+}
+
+/* ============================================
+   PRIVACY POLICY PAGE
+   Simple, text-only service page (privacy.html). No bleed text,
+   no glass badges, no dock-nav, no preloader — just a readable
+   column that borrows the site's fonts/colors.
+   ============================================ */
+
+.privacy-page {
+  background: var(--color-bg);
+  min-height: 100vh;
+  padding: clamp(48px, 8vw, 96px) 24px clamp(64px, 10vw, 120px);
+}
+
+.privacy-container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.privacy-back {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-black);
+  text-decoration: none;
+  opacity: 0.65;
+  transition: opacity 0.2s ease;
+}
+
+.privacy-back:hover {
+  opacity: 1;
+}
+
+.privacy-back-top {
+  margin-bottom: 32px;
+}
+
+.privacy-back-bottom {
+  margin-top: 48px;
+}
+
+.privacy-h1 {
+  font-family: var(--font-heading);
+  color: var(--color-black);
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  line-height: 1.1;
+  margin: 0 0 12px;
+}
+
+.privacy-updated {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-black);
+  opacity: 0.55;
+  margin: 0 0 48px;
+}
+
+.privacy-section {
+  margin-bottom: 40px;
+}
+
+.privacy-section h2 {
+  font-family: var(--font-heading);
+  color: var(--color-black);
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  line-height: 1.2;
+  margin: 0 0 14px;
+}
+
+.privacy-section p {
+  font-family: var(--font-body);
+  letter-spacing: normal;
+  color: var(--color-black);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0 0 16px;
+}
+
+.privacy-section p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .privacy-page {
+    padding: 40px 20px 64px;
+  }
+
+  .privacy-h1 {
+    font-size: 2rem;
+  }
+
+  .privacy-section {
+    margin-bottom: 32px;
   }
 }
