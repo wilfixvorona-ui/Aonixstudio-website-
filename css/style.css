@@ -2472,3 +2472,72 @@ body.preloader-active {
     margin-bottom: 32px;
   }
 }
+
+/* ============================================
+   404 PAGE
+   Minimal, brand-styled error page (404.html). No preloader,
+   no dock-nav, no badges, no contact modal — loads instantly.
+   ============================================ */
+
+.notfound-page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  padding: 24px;
+  text-align: center;
+}
+
+.notfound-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.notfound-code {
+  font-family: var(--font-display);
+  color: var(--color-black);
+  font-size: clamp(6rem, 18vw, 200px);
+  line-height: 1;
+  margin: 0;
+}
+
+.notfound-title {
+  font-family: var(--font-heading);
+  color: var(--color-black);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  line-height: 1.2;
+  margin: 16px 0 0;
+}
+
+.notfound-text {
+  font-family: var(--font-body);
+  letter-spacing: var(--font-body-tracking);
+  line-height: 1.6;
+  color: var(--color-black);
+  opacity: 0.6;
+  font-size: 1rem;
+  max-width: 420px;
+  margin: 14px 0 0;
+}
+
+.notfound-button {
+  margin-top: 36px;
+}
+
+@media (max-width: 640px) {
+  .notfound-page {
+    padding: 20px;
+  }
+
+  .notfound-text {
+    max-width: 320px;
+  }
+
+  .notfound-button {
+    width: 100%;
+    max-width: 320px;
+    justify-content: center;
+  }
+}
