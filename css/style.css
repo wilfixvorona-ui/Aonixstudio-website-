@@ -12,7 +12,8 @@
                           tracking/leading pair below
                           (--font-body-tracking / --font-body-leading)
                           so the look stays consistent wherever it's used.
-   Stack Sans Notch    — heading font (var(--font-heading))
+   Yeseva One          — heading font (var(--font-heading)), same on
+                          both the English and Ukrainian version
    SUSE Mono           — accent/mono style, var(--font-mono) or .font-mono
    ============================================ */
 
@@ -27,7 +28,7 @@
   --gradient-end: #8D36FF;
 
   --font-display: 'Anton', sans-serif;
-  --font-heading: 'Stack Sans Notch', sans-serif;
+  --font-heading: 'Yeseva One', serif;
   --font-body: 'Bricolage Grotesque', sans-serif;
   --font-body-tracking: -0.06em;
   --font-body-leading: 1;
@@ -78,6 +79,31 @@
   --social-icon-size-header: 18px;
   --social-btn-size-footer: 40px;
   --social-icon-size-footer: 20px;
+}
+
+/* Ukrainian version swaps the body typeface: Bricolage Grotesque
+   doesn't carry Cyrillic glyphs (Yeseva One, the heading font, does —
+   same family runs on both languages, see --font-heading in :root
+   above). JS (AonixI18N in js/script.js) sets <html lang="uk"> when
+   Ukrainian is active, so this override picks up automatically — the
+   English version (lang="en") never sees it. */
+html[lang="uk"] {
+  --font-body: 'Onest', sans-serif;
+
+  /* Two knobs to tune every Ukrainian heading at once instead of
+     hunting through each rule below: --font-heading-weight is an
+     absolute override (every rule normally has its own font-weight —
+     this replaces all of them at once), --font-heading-line-height-
+     scale is a multiplier applied on top of each rule's own
+     line-height (so the hero heading stays relatively tighter than
+     e.g. the statement text — only their ratio to each other is
+     preserved, not a single flat value). Edit the two values here;
+     nothing else needs to change. English is untouched either way —
+     every consuming rule falls back to its original literal number
+     when these are undefined, which is exactly the case outside
+     html[lang="uk"]. */
+  --font-heading-weight: 500;
+  --font-heading-line-height-scale: 1;
 }
 
 * {
@@ -272,9 +298,9 @@ a {
 
 .hero-heading {
   font-family: var(--font-heading);
-  font-weight: 300;
+  font-weight: var(--font-heading-weight, 300);
   font-size: clamp(1.9rem, 3.6vw, 4.2rem);
-  line-height: 0.9;
+  line-height: calc(var(--font-heading-line-height-scale, 1) * 0.9);
   max-width: 20ch;
   color: var(--color-black);
 
@@ -554,9 +580,9 @@ a {
   max-width: 1500px;
   margin: 0 auto;
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: var(--font-heading-weight, 400);
   font-size: clamp(1.8rem, 4.2vw, 3.9rem);
-  line-height: 1.28;
+  line-height: calc(var(--font-heading-line-height-scale, 1) * 1.28);
   text-align: center;
   letter-spacing: -0.01em;
 }
@@ -590,9 +616,9 @@ a {
 
 .pricing-title {
   font-family: var(--font-heading);
-  font-weight: 500;
+  font-weight: var(--font-heading-weight, 500);
   font-size: clamp(2.2rem, 4.2vw, 3.4rem);
-  line-height: 1;
+  line-height: calc(var(--font-heading-line-height-scale, 1) * 1);
   color: var(--color-black);
 }
 
@@ -704,7 +730,7 @@ a {
 
 .pricing-card-title {
   font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: var(--font-heading-weight, 600);
   font-size: clamp(1.8rem, 3vw, 2.4rem);
   margin-bottom: var(--pricing-title-gap);
 }
@@ -913,9 +939,9 @@ a {
 
 .faq-heading {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: var(--font-heading-weight, 400);
   font-size: clamp(1.8rem, 3vw, 2.5rem);
-  line-height: 1.15;
+  line-height: calc(var(--font-heading-line-height-scale, 1) * 1.15);
   color: var(--color-black);
   margin-bottom: 16px;
   
@@ -933,9 +959,9 @@ a {
 
 .faq-title {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: var(--font-heading-weight, 400);
   font-size: clamp(2.2rem, 4vw, 3.6rem);
-  line-height: 1;
+  line-height: calc(var(--font-heading-line-height-scale, 1) * 1);
   color: var(--color-black);
   margin-bottom: clamp(24px, 4vw, 40px);
 }
@@ -1017,9 +1043,9 @@ a {
 .quote-text {
   max-width: 1200px;
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: var(--font-heading-weight, 400);
   font-size: clamp(1.8rem, 3.6vw, 3.4rem);
-  line-height: 1;
+  line-height: calc(var(--font-heading-line-height-scale, 1) * 1);
   color: var(--color-black);
 }
 
@@ -1031,9 +1057,9 @@ a {
   max-width: 1100px;
   margin-top: clamp(24px, 3vw, 40px);
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: var(--font-heading-weight, 400);
   font-size: clamp(1.6rem, 3.4vw, 2rem);
-  line-height: 1;
+  line-height: calc(var(--font-heading-line-height-scale, 1) * 1);
   color: var(--color-black);
 }
 
@@ -1135,9 +1161,9 @@ a {
   max-width: 1300px;
   margin: 0 auto clamp(24px, 3vw, 36px);
   font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: var(--font-heading-weight, 600);
   font-size: clamp(2rem, 5.2vw, 4.6rem);
-  line-height: 1;
+  line-height: calc(var(--font-heading-line-height-scale, 1) * 1);
   color: var(--color-white);
 }
 
@@ -1184,7 +1210,7 @@ a {
   gap: 12px;
   color: var(--color-white);
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: var(--font-heading-weight, 400);
   font-size: 1.3rem;
 }
 
@@ -1250,7 +1276,7 @@ a {
 .footer-email {
   color: var(--color-white);
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: var(--font-heading-weight, 400);
   font-size: 1.15rem;
 }
 
@@ -1273,7 +1299,7 @@ a {
   padding: 8px 8px 8px 28px;
   border-radius: 999px;
   background: #141414;
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+  /* TEMP: shadow removed on request — restore box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3); when told to */
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -1462,6 +1488,29 @@ a {
   color: var(--color-white);
 }
 
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--social-btn-size-header);
+  height: var(--social-btn-size-header);
+  border: none;
+  border-radius: 50%;
+  background: #141414;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.lang-toggle:hover {
+  background: #1f1f1f;
+  color: var(--color-white);
+}
+
 body.dock-on-dark .dock-nav,
 body.dock-on-dark .dock-side {
   opacity: 0;
@@ -1579,9 +1628,9 @@ body.modal-open .marquee-track {
 
 .contact-modal-heading {
   font-family: var(--font-heading);
-  font-weight: 500;
+  font-weight: var(--font-heading-weight, 500);
   font-size: clamp(2rem, 3.6vw, 3rem);
-  line-height: 1;
+  line-height: calc(var(--font-heading-line-height-scale, 1) * 1);
   color: var(--color-black);
 }
 
@@ -1711,9 +1760,9 @@ body.preloader-active {
 
 .preloader-word {
   font-family: var(--font-heading);
-  font-weight: 500;
+  font-weight: var(--font-heading-weight, 500);
   font-size: clamp(2.5rem, 8vw, 6rem);
-  line-height: 1;
+  line-height: calc(var(--font-heading-line-height-scale, 1) * 1);
   color: var(--color-white);
 }
 
@@ -1919,6 +1968,16 @@ body.preloader-active {
 
   .badge-1 { left: 1%; }
   .badge-2 { right: 1%; }
+}
+
+/* Desktop only: center .hero-note against .hero-heading instead of
+   the base rule's align-items: flex-end (see .hero-content above) —
+   below 1025px they stack via the max-width: 1024px block right
+   above, where this doesn't apply. */
+@media (min-width: 1025px) {
+  .hero-content {
+    align-items: center;
+  }
 }
 
 @media (max-width: 900px) {
@@ -2418,11 +2477,29 @@ body.preloader-active {
   margin-top: 48px;
 }
 
+/* This page has no dock-nav/dock-side to anchor a language toggle to
+   (see the section comment above — no header at all), so it gets its
+   own fixed corner spot instead of sitting inline with anything. */
+.privacy-lang-toggle {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
+}
+
+@media (max-width: 640px) {
+  .privacy-lang-toggle {
+    top: 16px;
+    right: 16px;
+  }
+}
+
 .privacy-h1 {
   font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight, normal);
   color: var(--color-black);
   font-size: clamp(2.2rem, 5vw, 3.2rem);
-  line-height: 1.1;
+  line-height: calc(var(--font-heading-line-height-scale, 1) * 1.1);
   margin: 0 0 12px;
 }
 
@@ -2440,9 +2517,10 @@ body.preloader-active {
 
 .privacy-section h2 {
   font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight, normal);
   color: var(--color-black);
   font-size: clamp(1.3rem, 2.6vw, 1.7rem);
-  line-height: 1.2;
+  line-height: calc(var(--font-heading-line-height-scale, 1) * 1.2);
   margin: 0 0 14px;
 }
 
