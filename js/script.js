@@ -27,7 +27,7 @@ const AonixI18N = (function () {
       'burger.aria': 'Menu',
       'hero.badge1': 'FullStack Development',
       'hero.badge2': 'UX/UI Design',
-      'hero.heading': 'We design websites for small businesses that <span class="gradient-text">don’t</span> look like <span class="muted">your competitors’ AI-generated template</span>',
+      'hero.heading': 'We design websites for small businesses that <span class="gradient-text">don’t</span> look like everyone <span class="muted">else’s AI-generated template</span>',
       'hero.note': 'Every layout starts with UX research, not a template picker – so your site actually looks like your business, not a template.',
       'proj.cursorLabel': 'See the project',
       'proj1.title': 'Xionik - Digital',
@@ -54,7 +54,7 @@ const AonixI18N = (function () {
       'proj6.desc': 'Kids Care Africa is a volunteering website built to collect donations for children in Africa. Our priority was intuitive navigation and a fast donation process.',
       'proj6.tagType': 'Multi-page Website',
       'proj6.tagCat': 'Volunteering',
-      'statement.text': 'Making the site look good is only 10% of the job. The other 90% is the layout, the flow, the moment someone decides to click or not — all the things visitors never notice, but always feel.',
+      'statement.text': 'Looking good is 10% of the job. The other 90% is the layout, the flow, the moment someone decides to click — all the things visitors never notice, but always feel.',
       'pricing.title': 'Pricing for<br>our services',
       'pricing.note': 'Not sure which one fits? Landing Page works if you need one strong page that does the job. Multi-page makes sense if your business needs more room to explain itself.',
       'pricing.landingTitle': 'Landing Page',
@@ -79,11 +79,11 @@ const AonixI18N = (function () {
       'faq.subtitle': 'Quickly find answers to questions that our clients often ask us',
       'faq.title': '<span class="gradient-text">Still</span> Have Questions?',
       'faq.q1': 'How long does it take to build a website?',
-      'faq.a1': 'For Landing Page — 9-15 days.<br>For Multi-page website — 15-25 days.',
+      'faq.a1': 'For Landing Page — 10-15 days.<br>For Multi-page website — 15-21 days, if mini e-commerce then +7 days to work.',
       'faq.q2': 'How is the payment?',
       'faq.a2': 'We take a 50% prepayment, and before launching your site you pay the other 50% — then we launch the site and provide all the necessary files.',
       'faq.q3': 'What if I don’t like the result?',
-      'faq.a3': 'After the Figma design is ready, if you feel it’s not what you need, you have 24 hours to cancel the project and I’ll refund you — as long as I can use the design as a portfolio piece (without naming your business). Want the details? Get in touch and I’ll send you a document that explains it fully.',
+      'faq.a3': 'Before we start, we discuss your goals, target audience, and references in detail — we don’t open Figma until we have a clear shared vision of the result. During the work, you see progress at every stage, not just the final version, and if something feels off, we fix it immediately. Revisions are included in every package, which is enough to get the result right when we start with a strong brief.',
       'faq.q4': 'Do you only do design or also development?',
       'faq.a4': 'We handle everything: from UX/UI design in Figma to development and launch. You get a ready-to-use website with your own domain — no technical headaches on your side.',
       'faq.q5': 'How will we communicate while working?',
@@ -213,19 +213,19 @@ const AonixI18N = (function () {
       'faq.q4': 'Ви робите лише дизайн чи ще й розробку?',
       'faq.a4': 'Ми беремо на себе все: від UX/UI дизайну у Figma до розробки й запуску. Ви отримуєте готовий до використання сайт із власним доменом — без жодного технічного клопоту з вашого боку.',
       'faq.q5': 'Як ми будемо спілкуватися під час роботи?',
-      'faq.a5': 'Ми спілкуємось через WhatsApp або Telegram — там, де вам зручніше. Ви бачитимете прогрес на кожному етапі й можете ставити запитання в будь-який час.',
+      'faq.a5': 'Ми спілкуємось через WhatsApp,Telegram, email, instagram — там, де вам зручніше. Ви бачитимете прогрес на кожному етапі й можете ставити запитання в будь-який час.',
       'faq.q6': 'Чому варто обрати вас, а не дешевого фрилансера чи ШІ?',
       'faq.a6': 'Ми не просто робимо сайти красивими — ми продумуємо логіку, структуру та шлях користувача, щоб ваш сайт справді перетворював відвідувачів на покупців. Ви отримуєте унікальний дизайн, швидкий зв’язок і команду, яка ставиться до вашого бізнесу як до свого.',
       'faq.q7': 'Що потрібно від мене, щоб почати?',
       'faq.a7': 'Просто розкажіть нам про свій бізнес — чим ви займаєтесь, хто ваші клієнти і чого ви хочете досягти за допомогою сайту. Щоб почати, підготуйте назву бізнесу, логотип і фото, які хочете бачити на сайті. Все інше ми зробимо самі й проведемо вас через кожен крок.',
-      'quote.text': '<span class="gradient-text">Найбільша</span> проблема більшості сайтів — не в тому, як вони виглядають, а в <span class="muted">логіці, зручності використання, адаптивному досвіді та розумінні</span> того, для кого вони насправді створені',
+      'quote.text': '<span class="gradient-text">Найбільша</span> Найбільша проблема більшості сайтів — не в тому, як вони виглядають, а в <span class="muted">логіці, зручності використання, адаптивному досвіді та розумінні</span> того, для кого вони насправді створені',
       'quote.note': 'Саме це ми вирішуємо в кожному проєкті — щоб ваші потенційні клієнти відчували себе комфортно, користуючись сайтом з першої ж секунди.',
       'quote.role': 'UX/UI дизайнер',
       'marquee.hand': 'Створено вручну, а не за промптом',
       'marquee.calls': 'Перетворює відвідувачів на дзвінки',
       'marquee.looks': 'Виглядає як ви, а не як усі',
       'marquee.launch': 'Запуск за тижні, а не місяці',
-      'cta.heading': 'Що довше ви чекаєте,<br> то більше <span class="dim">грошей</span><br> втрачає ваш <span class="dim">бізнес</span>',
+      'cta.heading': 'Чим довше ви чекаєте,<br> то більше <span class="dim">грошей</span><br> втрачає ваш <span class="dim">бізнес</span>',
       'cta.talk': 'Поговорімо',
       'footer.privacy': 'Політика конфіденційності',
       'modal.heading': 'Зв’язатися з нами',
@@ -270,29 +270,8 @@ const AonixI18N = (function () {
     },
   };
 
-  // URL routing: /ua (and /ua/privacy.html) mirror / (and /privacy.html)
-  // — see vercel.json, which rewrites both paths to the same static
-  // file, so the server side needs no changes. Which of the two pages
-  // we're on is read straight off the current path, since only these
-  // two include this script.
-  function isPrivacyPage() {
-    return /privacy(\.html)?\/?$/.test(location.pathname);
-  }
-
-  function urlForLang(lang) {
-    const onPrivacy = isPrivacyPage();
-    if (lang === 'uk') return onPrivacy ? '/ua/privacy.html' : '/ua';
-    return onPrivacy ? '/privacy.html' : '/';
-  }
-
-  function pathLang() {
-    return /^\/ua(\/|$)/.test(location.pathname) ? 'uk' : null;
-  }
-
   const listeners = [];
-  // The URL wins when it explicitly says /ua (e.g. a shared link);
-  // otherwise fall back to the last choice remembered in localStorage.
-  let current = pathLang() || (localStorage.getItem(STORAGE_KEY) === 'uk' ? 'uk' : 'en');
+  let current = localStorage.getItem(STORAGE_KEY) === 'uk' ? 'uk' : 'en';
 
   function t(key) {
     const dict = STRINGS[current];
@@ -326,33 +305,11 @@ const AonixI18N = (function () {
         current === 'uk' ? 'Switch to English' : 'Переключити на українську'
       );
     }
-
-    // Cross-page links need to carry the current language along too,
-    // otherwise following them would silently drop back to English.
-    const footerPrivacy = document.querySelector('.footer-privacy');
-    if (footerPrivacy) footerPrivacy.setAttribute('href', current === 'uk' ? '/ua/privacy.html' : '/privacy.html');
-
-    document.querySelectorAll('.privacy-back').forEach((el) => {
-      el.setAttribute('href', current === 'uk' ? '/ua' : '/');
-    });
-  }
-
-  // Pushes/replaces the address bar to match `current` without a
-  // reload — replace on initial load (silently correcting a stale
-  // URL, not something the user should be able to hit "back" out of),
-  // push on an explicit toggle click (a real navigation the user can
-  // undo with the back button).
-  function syncUrl(replace) {
-    const target = urlForLang(current) + location.search + location.hash;
-    if (location.pathname === urlForLang(current)) return;
-    const method = replace ? 'replaceState' : 'pushState';
-    history[method]({ lang: current }, '', target);
   }
 
   function setLang(lang) {
     current = lang === 'uk' ? 'uk' : 'en';
     localStorage.setItem(STORAGE_KEY, current);
-    syncUrl(false);
     applyToDom();
     listeners.forEach((fn) => fn(current));
   }
@@ -361,17 +318,7 @@ const AonixI18N = (function () {
     listeners.push(fn);
   }
 
-  window.addEventListener('popstate', () => {
-    const lang = pathLang() || 'en';
-    if (lang === current) return;
-    current = lang;
-    localStorage.setItem(STORAGE_KEY, current);
-    applyToDom();
-    listeners.forEach((fn) => fn(current));
-  });
-
   applyToDom();
-  syncUrl(true);
 
   return {
     t,
