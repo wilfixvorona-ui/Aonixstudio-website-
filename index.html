@@ -20,8 +20,31 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Yeseva+One&family=SUSE+Mono:wght@400;500;600;700&family=Onest:wght@200..800&display=swap" rel="stylesheet">
-<link href="css/style.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Unbounded:wght@200..900&family=SUSE+Mono:wght@400;500;600;700&family=Onest:wght@200..800&display=swap" rel="stylesheet">
+<link href="/css/style.css" rel="stylesheet">
+<link rel="alternate" hreflang="uk" href="https://www.aonixstudio.com/ua/">
+<link rel="alternate" hreflang="en" href="https://www.aonixstudio.com/en/">
+<link rel="alternate" hreflang="x-default" href="https://www.aonixstudio.com/">
+<script>
+  // Runs before first paint: .js scopes the "hidden until revealed"
+  // states, .anim switches the motion on (never for reduced-motion users).
+  (function (d) {
+    d.classList.add("js");
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("anim");
+  })(document.documentElement);
+
+  // Servers without vercel.json rewrites (e.g. VS Code Live Server
+  // with its index.html fallback) hand back THIS page for
+  // /ua/privacy.html. Spot that and hop to the real privacy page,
+  // keeping the language — it puts /ua/ back in the address itself.
+  (function () {
+    if (!/^https?:$/.test(location.protocol)) return;
+    var m = location.pathname.match(/^\/(ua|en)(\/privacy(\.html)?)\/?$/);
+    if (!m) return;
+    try { localStorage.setItem("aonixLang", m[1] === "ua" ? "uk" : "en"); } catch (e) {}
+    location.replace("/privacy.html" + location.search + location.hash);
+  })();
+</script>
 <meta name="theme-color" content="#0a0a0a">
 </head>
 <body>
@@ -35,14 +58,14 @@
       <div class="hero-pin">
 
         <div class="hero-headline" aria-hidden="true">
-         <span class="line">AONIX STUDIO</span>
+         <span class="line big-word">AONIX STUDIO</span>
         </div>
 
         <div class="badge badge-1"><span data-i18n="hero.badge1">FullStack Development</span></div>
         <div class="badge badge-2"><span data-i18n="hero.badge2">UX/UI Design</span></div>
 
         <div class="hero-content">
-          <h1 class="hero-heading" data-i18n="hero.heading" data-i18n-html>
+          <h1 class="hero-heading" data-i18n="hero.heading" data-i18n-html data-split>
             We design websites for small businesses that
             <span class="gradient-text">don&rsquo;t</span>
             look like
@@ -64,7 +87,7 @@
         <article class="project-card reveal">
           <a class="project-thumb" href="https://klyckium.vercel.app/" target="_blank" rel="noopener noreferrer">
             <div class="project-thumb-media">
-              <img src="img/klykium.png" alt="Klykium project screenshot" loading="lazy">
+              <img src="/img/klykium.png" alt="Klykium project screenshot" loading="lazy">
             </div>
             <div class="project-cursor" aria-hidden="true">
               <span class="project-cursor-badge">
@@ -88,7 +111,7 @@
         <article class="project-card reveal">
           <a class="project-thumb" href="https://tempo-two-ochre.vercel.app/" target="_blank" rel="noopener noreferrer">
             <div class="project-thumb-media">
-              <img src="img/tempo-poster.png" alt="Tempo project screenshot" loading="lazy">
+              <img src="/img/tempo-poster.png" alt="Tempo project screenshot" loading="lazy">
             </div>
             <div class="project-cursor" aria-hidden="true">
               <span class="project-cursor-badge">
@@ -112,7 +135,7 @@
         <article class="project-card reveal">
           <a class="project-thumb" href="https://xionik.vercel.app/" target="_blank" rel="noopener noreferrer">
             <div class="project-thumb-media">
-              <img src="img/xoionik photo.png" alt="Xionik project screenshot" loading="lazy">
+              <img src="/img/xoionik photo.png" alt="Xionik project screenshot" loading="lazy">
             </div>
             <div class="project-cursor" aria-hidden="true">
               <span class="project-cursor-badge">
@@ -136,7 +159,7 @@
         <article class="project-card reveal">
           <a class="project-thumb" href="https://fovea-eye.vercel.app/" target="_blank" rel="noopener noreferrer">
             <div class="project-thumb-media">
-              <img src="img/fovea-site.png" alt="Fovea project screenshot" loading="lazy">
+              <img src="/img/fovea-site.png" alt="Fovea project screenshot" loading="lazy">
             </div>
             <div class="project-cursor" aria-hidden="true">
               <span class="project-cursor-badge">
@@ -160,7 +183,7 @@
         <article class="project-card reveal">
           <a class="project-thumb" href="https://yachtuu.vercel.app/" target="_blank" rel="noopener noreferrer">
             <div class="project-thumb-media">
-              <img src="img/yachtuu.png" alt="Yachtuu project screenshot" loading="lazy">
+              <img src="/img/yachtuu.png" alt="Yachtuu project screenshot" loading="lazy">
             </div>
             <div class="project-cursor" aria-hidden="true">
               <span class="project-cursor-badge">
@@ -184,7 +207,7 @@
         <article class="project-card reveal">
           <a class="project-thumb" href="https://yopavee-contruction-company.vercel.app/" target="_blank" rel="noopener noreferrer">
             <div class="project-thumb-media">
-              <img src="img/yopavve.png" alt="yopavve project screenshot" loading="lazy">
+              <img src="/img/yopavve.png" alt="yopavve project screenshot" loading="lazy">
             </div>
             <div class="project-cursor" aria-hidden="true">
               <span class="project-cursor-badge">
@@ -208,7 +231,7 @@
         <article class="project-card reveal">
           <a class="project-thumb" href="https://burger-hub-website.vercel.app/" target="_blank" rel="noopener noreferrer">
             <div class="project-thumb-media">
-              <img src="img/burgerhub.png" alt="burgerhub project screenshot" loading="lazy">
+              <img src="/img/burgerhub.png" alt="burgerhub project screenshot" loading="lazy">
             </div>
             <div class="project-cursor" aria-hidden="true">
               <span class="project-cursor-badge">
@@ -232,7 +255,7 @@
         <article class="project-card reveal">
           <a class="project-thumb" href="https://kids-care-africa.vercel.app" target="_blank" rel="noopener noreferrer">
             <div class="project-thumb-media">
-              <img src="img/Frame 988.png" alt="Kids care project screenshot" loading="lazy">
+              <img src="/img/Frame 988.png" alt="Kids care project screenshot" loading="lazy">
             </div>
             <div class="project-cursor" aria-hidden="true">
               <span class="project-cursor-badge">
@@ -257,7 +280,7 @@
     </section>
 
     <section class="statement" id="statement">
-      <div class="statement-inner stack-pin">
+      <div class="statement-inner">
         <p class="statement-text" data-fill-text data-i18n="statement.text">
           Making the site look good is only 10% of the job. The other 90% is the layout, the flow, the moment someone decides to click or not &mdash; all the things visitors never notice, but always feel.
         </p>
@@ -266,9 +289,9 @@
 
     <section class="pricing" id="pricing">
 
-      <div class="pricing-header reveal">
-        <h2 class="pricing-title" data-i18n="pricing.title" data-i18n-html>Pricing for<br>our services</h2>
-        <p class="pricing-note font-mono" data-i18n="pricing.note">Not sure which one fits? Landing Page works if you need one strong page that does the job. Multi-page makes sense if your business needs more room to explain itself.</p>
+      <div class="pricing-header">
+        <h2 class="pricing-title" data-i18n="pricing.title" data-i18n-html data-split>Pricing for<br>our services</h2>
+        <p class="pricing-note font-mono reveal" data-i18n="pricing.note">Not sure which one fits? Landing Page works if you need one strong page that does the job. Multi-page makes sense if your business needs more room to explain itself.</p>
       </div>
 
       <div class="pricing-cards">
@@ -330,17 +353,17 @@
     <section class="faq" id="faq">
       <div class="faq-grid">
 
-        <div class="faq-intro reveal">
-          <picture class="faq-icon">
-            <source srcset="img/glass-question.webp" type="image/webp">
-            <img src="img/glass-question.png" alt="" width="338" height="433" loading="lazy">
+        <div class="faq-intro">
+          <picture class="faq-icon reveal">
+            <source srcset="/img/glass-question.webp" type="image/webp">
+            <img src="/img/glass-question.png" alt="" width="338" height="433" loading="lazy">
           </picture>
-          <h2 class="faq-heading" data-i18n="faq.heading" data-i18n-html>Frequently Asked<br>Questions</h2>
-          <p class="faq-subtitle" data-i18n="faq.subtitle">Quickly find answers to questions that our clients often ask us</p>
+          <h2 class="faq-heading" data-i18n="faq.heading" data-i18n-html data-split>Frequently Asked<br>Questions</h2>
+          <p class="faq-subtitle reveal" data-i18n="faq.subtitle">Quickly find answers to questions that our clients often ask us</p>
         </div>
 
         <div class="faq-list-wrap">
-          <h2 class="faq-title reveal" data-i18n="faq.title" data-i18n-html><span class="gradient-text">Still</span> Have Questions?</h2>
+          <h2 class="faq-title" data-i18n="faq.title" data-i18n-html data-split><span class="gradient-text">Still</span> Have Questions?</h2>
 
           <div class="faq-accordion">
 
@@ -436,42 +459,42 @@
         <div class="marquee-track">
           <span class="marquee-item" data-i18n="marquee.hand">Built by hand, not by prompt</span>
           <span class="marquee-logo" aria-hidden="true">
-            <img src="img/logotype.png" alt="">
+            <img src="/img/logotype.png" alt="">
           </span>
           <span class="marquee-item" data-i18n="marquee.calls">Turns visitors into calls</span>
           <span class="marquee-logo" aria-hidden="true">
-            <img src="img/logotype.png" alt="">
+            <img src="/img/logotype.png" alt="">
           </span>
           <span class="marquee-item" data-i18n="marquee.looks">Looks like you, not like everyone</span>
           <span class="marquee-logo" aria-hidden="true">
-            <img src="img/logotype.png" alt="">
+            <img src="/img/logotype.png" alt="">
           </span>
           <span class="marquee-item" data-i18n="marquee.launch">Launch in weeks, not months</span>
           <span class="marquee-logo" aria-hidden="true">
-            <img src="img/logotype.png" alt="">
+            <img src="/img/logotype.png" alt="">
           </span>
 
           <span class="marquee-item" aria-hidden="true" data-i18n="marquee.hand">Built by hand, not by prompt</span>
           <span class="marquee-logo" aria-hidden="true">
-            <img src="img/logotype.png" alt="">
+            <img src="/img/logotype.png" alt="">
           </span>
           <span class="marquee-item" aria-hidden="true" data-i18n="marquee.calls">Turns visitors into calls</span>
           <span class="marquee-logo" aria-hidden="true">
-            <img src="img/logotype.png" alt="">
+            <img src="/img/logotype.png" alt="">
           </span>
           <span class="marquee-item" aria-hidden="true" data-i18n="marquee.looks">Looks like you, not like everyone</span>
           <span class="marquee-logo" aria-hidden="true">
-            <img src="img/logotype.png" alt="">
+            <img src="/img/logotype.png" alt="">
           </span>
           <span class="marquee-item" aria-hidden="true" data-i18n="marquee.launch">Launch in weeks, not months</span>
           <span class="marquee-logo" aria-hidden="true">
-            <img src="img/logotype.png" alt="">
+            <img src="/img/logotype.png" alt="">
           </span>
         </div>
       </div>
 
       <div class="cta">
-        <h2 class="cta-heading" data-i18n="cta.heading" data-i18n-html>
+        <h2 class="cta-heading" data-i18n="cta.heading" data-i18n-html data-split>
           The longer you wait,<br>
           the more <span class="dim">money</span> your<br>
           business <span class="dim">loses</span>
@@ -486,22 +509,22 @@
       <footer class="site-footer">
         <div class="footer-brand">
           <a href="#top" class="footer-logo">
-            <img src="img/logotype.png" alt="" width="30" height="22">
+            <img src="/img/logotype.png" alt="" width="30" height="22">
             Aonix Studio
           </a>
-          <a href="/privacy.html" class="footer-privacy" data-i18n="footer.privacy">Privacy Policy</a>
+          <a href="/privacy.html" class="footer-privacy" data-lang-href="/privacy.html" data-i18n="footer.privacy">Privacy Policy</a>
         </div>
 
         <div class="footer-contact">
           <div class="footer-socials">
             <a href="https://t.me/aonixstudio" aria-label="Telegram" target="_blank" rel="noopener noreferrer">
-              <img src="img/icon-telegram.png" alt="">
+              <img src="/img/icon-telegram.png" alt="">
             </a>
             <a href="https://wa.me/380930344528" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">
-              <img src="img/icon-whatsapp.png" alt="">
+              <img src="/img/icon-whatsapp.png" alt="">
             </a>
             <a href="https://www.tiktok.com/@aonix.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer">
-              <img src="img/icon-tiktok.png" alt="">
+              <img src="/img/icon-tiktok.png" alt="">
             </a>
           </div>
           <a href="mailto:hello@aonixstudio.com" class="footer-email">hello@aonixstudio.com</a>
@@ -515,7 +538,7 @@
 
   <header class="dock-nav">
     <a href="#top" class="dock-logo" aria-label="Aonix Studio — Home" data-i18n-attr="aria-label:dockLogo.aria">
-      <img src="img/logotype.png" alt="" width="28" height="21">
+      <img src="/img/logotype.png" alt="" width="28" height="21">
     </a>
 
     <nav class="dock-links">
@@ -547,14 +570,14 @@
   <div class="dock-side dock-side-right">
     <button type="button" class="lang-toggle" id="lang-toggle" aria-label="Switch language">UA</button>
     <a href="https://t.me/aonixstudio" aria-label="Telegram" target="_blank" rel="noopener noreferrer">
-      <img src="img/icon-telegram.png" alt="">
+      <img src="/img/icon-telegram.png" alt="">
     </a>
     <a href="https://wa.me/380930344528" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">
-      <img src="img/icon-whatsapp.png" alt="">
+      <img src="/img/icon-whatsapp.png" alt="">
     </a>
   </div>
 
-  <div class="contact-modal" id="contact-modal" aria-hidden="true">
+  <div class="contact-modal" id="contact-modal" aria-hidden="true" data-lenis-prevent>
     <div class="contact-modal-backdrop" data-close-contact></div>
 
     <div class="contact-modal-panel" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
@@ -597,7 +620,10 @@
 
 <!-- END PLERDY CODE -->
 
-  <script src="js/script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="/js/script.js"></script>
 
 </body>
 

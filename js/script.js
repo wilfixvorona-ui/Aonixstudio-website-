@@ -287,7 +287,57 @@ const AonixI18N = (function () {
   };
 
   const listeners = [];
-  let current = localStorage.getItem(STORAGE_KEY) === 'uk' ? 'uk' : 'en';
+  const SITE = 'https://www.aonixstudio.com';
+  // Internal code is 'uk' (matches <html lang>), the URL prefix is /ua.
+  const URL_CODE = { uk: 'ua', en: 'en' };
+  // pushState/replaceState don't work on file:// — there the language
+  // still switches, the address just stays as it is.
+  const canRoute = /^https?:$/.test(location.protocol);
+
+  function readStorage() {
+    try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+  }
+
+  function writeStorage(value) {
+    try { localStorage.setItem(STORAGE_KEY, value); } catch (e) { /* private mode */ }
+  }
+
+  function langFromPath(pathname) {
+    const match = pathname.match(/^\/(ua|en)(?=\/|$)/);
+    if (!match) return null;
+    return match[1] === 'ua' ? 'uk' : 'en';
+  }
+
+  // "/ua/privacy.html" → "/privacy.html", "/en" → "/", "/index.html" → "/"
+  function stripLang(pathname) {
+    let rest = pathname.replace(/^\/(ua|en)(?=\/|$)/, '') || '/';
+    if (rest === '/index.html') rest = '/';
+    return rest;
+  }
+
+  function localizedPath(lang, rest) {
+    return '/' + URL_CODE[lang] + rest;
+  }
+
+  // URL first, then the stored choice, then the browser's language.
+  function detect() {
+    const fromUrl = canRoute ? langFromPath(location.pathname) : null;
+    if (fromUrl) return fromUrl;
+    const stored = readStorage();
+    if (stored === 'uk' || stored === 'en') return stored;
+    return /^uk\b/i.test(navigator.language || '') ? 'uk' : 'en';
+  }
+
+  // Keeps the rest of the path, the ?query and the #hash untouched.
+  function syncUrl(mode) {
+    if (!canRoute) return;
+    const target = localizedPath(current, stripLang(location.pathname)) + location.search + location.hash;
+    const now = location.pathname + location.search + location.hash;
+    if (target === now) return;
+    try { history[mode === 'push' ? 'pushState' : 'replaceState'](null, '', target); } catch (e) { /* sandboxed */ }
+  }
+
+  let current = detect();
 
   function t(key) {
     const dict = STRINGS[current];
@@ -313,6 +363,31 @@ const AonixI18N = (function () {
       });
     });
 
+    document.querySelectorAll('[data-i18n-alt]').forEach((el) => {
+      const value = t(el.getAttribute('data-i18n-alt'));
+      if (value !== undefined) el.setAttribute('alt', value);
+    });
+
+    document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+      const value = t(el.getAttribute('data-i18n-aria'));
+      if (value !== undefined) el.setAttribute('aria-label', value);
+    });
+
+    // Internal links that should stay inside the current language
+    // (/privacy.html → /ua/privacy.html). Only on a real server.
+    if (canRoute) {
+      document.querySelectorAll('[data-lang-href]').forEach((el) => {
+        el.setAttribute('href', localizedPath(current, el.getAttribute('data-lang-href')));
+      });
+    }
+
+    // canonical / og:url follow the language version being shown.
+    document.querySelectorAll('link[rel="canonical"], meta[property="og:url"]').forEach((el) => {
+      const attr = el.tagName === 'LINK' ? 'href' : 'content';
+      const path = new URL(el.getAttribute(attr), SITE).pathname;
+      el.setAttribute(attr, SITE + localizedPath(current, stripLang(path)));
+    });
+
     const toggle = document.getElementById('lang-toggle');
     if (toggle) {
       toggle.textContent = current === 'uk' ? 'EN' : 'UA';
@@ -323,10 +398,15 @@ const AonixI18N = (function () {
     }
   }
 
-  function setLang(lang) {
-    current = lang === 'uk' ? 'uk' : 'en';
-    localStorage.setItem(STORAGE_KEY, current);
+  // opts.fromHistory: called from popstate — the URL is already right,
+  // so don't push a new history entry on top of it.
+  function setLang(lang, opts) {
+    const next = lang === 'uk' ? 'uk' : 'en';
+    if (next === current) return;
+    current = next;
+    writeStorage(current);
     applyToDom();
+    if (!(opts && opts.fromHistory)) syncUrl('push');
     listeners.forEach((fn) => fn(current));
   }
 
@@ -335,6 +415,13 @@ const AonixI18N = (function () {
   }
 
   applyToDom();
+  syncUrl('replace');
+
+  // Back/forward between /ua and /en: switch instantly, no curtain.
+  window.addEventListener('popstate', () => {
+    const fromUrl = langFromPath(location.pathname);
+    if (fromUrl) setLang(fromUrl, { fromHistory: true });
+  });
 
   return {
     t,
@@ -347,13 +434,119 @@ const AonixI18N = (function () {
 })();
 
 // Language toggle button (dock-side-right, before the Telegram/
-// WhatsApp icons): flips between the two languages set up above.
+// WhatsApp icons): flips between the two languages set up above,
+// behind a full-screen "curtain" (.lang-curtain in css/style.css) so
+// the text swap itself is never visible. ~2s GSAP timeline:
+// curtain rises → target language name surfaces → texts swap while
+// fully covered → name exits up → curtain lifts away.
+// Reduced motion (no html.anim) or no GSAP → instant switch.
 (function () {
   const btn = document.getElementById('lang-toggle');
   if (!btn) return;
+
+  const NAMES = { en: 'English', uk: 'Українська' };
+  let curtain = null;
+  let word = null;
+  let busy = false;
+
+  function canAnimate() {
+    return !!window.gsap && document.documentElement.classList.contains('anim');
+  }
+
+  function build() {
+    curtain = document.createElement('div');
+    curtain.className = 'lang-curtain';
+    curtain.setAttribute('aria-hidden', 'true');
+    word = document.createElement('span');
+    word.className = 'lang-curtain-word gradient-text';
+    curtain.appendChild(word);
+    document.body.appendChild(curtain);
+  }
+
+  function switchTo(lang) {
+    if (busy || lang === AonixI18N.lang) return;
+    if (!canAnimate()) {
+      AonixI18N.setLang(lang);
+      return;
+    }
+
+    busy = true;
+    word.textContent = NAMES[lang];
+
+    gsap.timeline({ onComplete: () => { busy = false; } })
+      .set(curtain, { visibility: 'visible' })
+      .fromTo(curtain,
+        { clipPath: 'inset(100% 0% 0% 0%)' },
+        { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.6, ease: 'expo.inOut' })
+      .fromTo(word,
+        { yPercent: 100, opacity: 0 },
+        { yPercent: 0, opacity: 1, duration: 0.5, ease: 'expo.out' },
+        '-=0.2')
+      .add(() => AonixI18N.setLang(lang))
+      .to(word, { yPercent: -100, opacity: 0, duration: 0.4, ease: 'expo.in' }, '+=0.15')
+      .to(curtain, { clipPath: 'inset(0% 0% 100% 0%)', duration: 0.7, ease: 'expo.inOut' })
+      .set(curtain, { visibility: 'hidden' });
+  }
+
+  if (window.gsap) build();
+
   btn.addEventListener('click', () => {
-    AonixI18N.setLang(AonixI18N.lang === 'uk' ? 'en' : 'uk');
+    switchTo(AonixI18N.lang === 'uk' ? 'en' : 'uk');
   });
+})();
+
+// "Page is ready" signal for the hero entrance: fired once, when the
+// preloader starts sliding away (or right away when it's skipped).
+// Adds body.is-ready, which the CSS keys the hero sequence off.
+const AonixReady = (function () {
+  let fired = false;
+  const callbacks = [];
+
+  return {
+    fire() {
+      if (fired) return;
+      fired = true;
+      document.body.classList.add('is-ready');
+      callbacks.forEach((fn) => fn());
+    },
+    then(fn) {
+      if (fired) fn();
+      else callbacks.push(fn);
+    },
+  };
+})();
+
+// Smooth inertial scrolling (Lenis). Driven off GSAP's ticker and
+// feeding ScrollTrigger on every frame, so the scrubbed effects
+// (statement words, project photo parallax) move in lockstep with the
+// smoothed position instead of the raw wheel jumps. Touch devices keep
+// native scrolling (Lenis' default). Off for reduced motion / no
+// Lenis — then this is null and everything falls back to native.
+// .stop()/.start() are used by the preloader and the contact modal to
+// freeze the page behind them.
+const AonixScroll = (function () {
+  if (!window.Lenis || !document.documentElement.classList.contains('anim')) return null;
+
+  const lenis = new Lenis({
+    lerp: 0.08,          // lower = smoother/longer glide (Lenis default 0.1)
+    wheelMultiplier: 1,
+    smoothWheel: true,
+  });
+
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+  } else {
+    const raf = (time) => {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    };
+    requestAnimationFrame(raf);
+  }
+
+  return lenis;
 })();
 
 // Preloader: cycles a "Welcome" greeting through a few languages,
@@ -370,7 +563,10 @@ const AonixI18N = (function () {
 (function () {
   const preloader = document.getElementById('preloader');
   const wordEl = document.getElementById('preloader-word');
-  if (!preloader || !wordEl) return;
+  if (!preloader || !wordEl) {
+    AonixReady.fire();
+    return;
+  }
 
   const navEntry = performance.getEntriesByType('navigation')[0];
   const isReload = navEntry && navEntry.type === 'reload';
@@ -380,6 +576,7 @@ const AonixI18N = (function () {
     // Not a manual reload, and this tab already saw the greeting —
     // skip straight to content: no animation, no scroll lock.
     preloader.classList.add('is-done');
+    AonixReady.fire();
     return;
   }
 
@@ -390,10 +587,13 @@ const AonixI18N = (function () {
   const STEP_DURATION = TOTAL_DURATION / WORDS.length;
 
   document.body.classList.add('preloader-active');
+  if (AonixScroll) AonixScroll.stop();
 
   function finish() {
     document.body.classList.remove('preloader-active');
+    if (AonixScroll) AonixScroll.start();
     preloader.classList.add('is-hiding');
+    AonixReady.fire();
     preloader.addEventListener(
       'transitionend',
       () => preloader.classList.add('is-done'),
@@ -407,7 +607,9 @@ const AonixI18N = (function () {
     wordEl.textContent = WORDS[0];
     setTimeout(() => {
       document.body.classList.remove('preloader-active');
+      if (AonixScroll) AonixScroll.start();
       preloader.classList.add('is-done');
+      AonixReady.fire();
     }, 500);
     return;
   }
@@ -425,65 +627,126 @@ const AonixI18N = (function () {
   }, STEP_DURATION);
 })();
 
-// Scroll effect: reveal [data-fill-text] word by word, in reading
-// order, as the .statement section's sticky inner (.stack-pin) is
-// pinned. Each word flips straight from #e5e5e5 to #0a0a0a (see
-// .statement-text .word / .is-filled in css/style.css) — no fade.
-// rAF-throttled so fast scrolling stays smooth.
+// ScrollTrigger measures positions by jumping the page to the top and
+// back; html { scroll-behavior: smooth } turns those jumps into
+// animated scrolls, so every start/end came out a full scroll offset
+// wrong. So whenever ScrollTrigger is on the page, CSS smooth
+// scrolling is switched off and in-page #anchor links glide via JS
+// instead (same feel as before).
+(function () {
+  if (!window.gsap || !window.ScrollTrigger) return;
+  gsap.registerPlugin(ScrollTrigger);
+  document.documentElement.style.scrollBehavior = 'auto';
+
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    const link = e.target.closest('a[href^="#"]');
+    if (!link) return;
+    const hash = link.getAttribute('href');
+    const target = hash === '#top' ? null : document.querySelector(hash);
+    if (hash !== '#top' && !target) return;
+
+    e.preventDefault();
+    const top = target ? target.getBoundingClientRect().top + window.scrollY : 0;
+    if (AonixScroll) {
+      AonixScroll.scrollTo(top, { duration: 1.4, easing: (t) => 1 - Math.pow(1 - t, 4) });
+    } else {
+      const smooth = document.documentElement.classList.contains('anim');
+      window.scrollTo({ top, behavior: smooth ? 'smooth' : 'auto' });
+    }
+    try { history.pushState(null, '', hash); } catch (err) { /* file:// */ }
+  });
+})();
+
+// Scroll effect on [data-fill-text] (.statement, right after the
+// projects): every word starts as a faint silhouette (.sw at
+// opacity .14, see css/style.css) and comes up to full opacity in
+// reading order, scrubbed to the scroll position — stop scrolling and
+// it stops, scroll back and the words dim again. Only opacity is
+// animated and the spans stay plain inline, so wrapping/layout are
+// identical to the untouched paragraph. Inline images/icons, if the
+// text ever gets any, pop in from scale 0 with a little overshoot.
+//
+// No pinning: the paragraph scrolls past normally. Reveal starts as
+// its top crosses 82% of the viewport and is complete once its bottom
+// reaches the middle of the screen.
+//
+// No GSAP / reduced motion (no html.anim): nothing is split or hidden.
 (function () {
   const section = document.querySelector('.statement');
   const textEl = document.querySelector('[data-fill-text]');
   if (!section || !textEl) return;
+  if (!window.gsap || !window.ScrollTrigger) return;
+  if (!document.documentElement.classList.contains('anim')) return;
 
-  let words = [];
-  let filledCount = -1;
-  let ticking = false;
+  gsap.registerPlugin(ScrollTrigger);
 
-  function splitIntoWords() {
-    const list = textEl.textContent.trim().replace(/\s+/g, ' ').split(' ');
-    textEl.innerHTML = list
-      .map((word) => `<span class="word">${word}</span>`)
-      .join(' ');
-    return Array.from(textEl.querySelectorAll('.word'));
+  const MEDIA = 'img, svg, picture';
+  let tl = null;
+
+  // Wraps each word in <span class="sw">, leaving the whitespace as
+  // ordinary text nodes between them; recurses into <em>/<strong>/<a>
+  // etc. so nested formatting survives; media is left as is.
+  function wrapWords(node) {
+    Array.from(node.childNodes).forEach((child) => {
+      if (child.nodeType === Node.TEXT_NODE) {
+        if (!child.textContent.trim()) return;
+        const frag = document.createDocumentFragment();
+        child.textContent.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          if (!part.trim()) {
+            frag.appendChild(document.createTextNode(part));
+            return;
+          }
+          const span = document.createElement('span');
+          span.className = 'sw';
+          span.textContent = part;
+          frag.appendChild(span);
+        });
+        child.replaceWith(frag);
+      } else if (child.nodeType === Node.ELEMENT_NODE && !child.matches(MEDIA) && !child.classList.contains('sw')) {
+        wrapWords(child);
+      }
+    });
   }
 
-  function updateFill() {
-    const rect = section.getBoundingClientRect();
-    const scrollable = rect.height - window.innerHeight;
-    const progress = scrollable > 0
-      ? Math.min(1, Math.max(0, -rect.top / scrollable))
-      : 0;
-
-    const activeCount = Math.round(progress * words.length);
-    if (activeCount !== filledCount) {
-      words.forEach((word, i) => {
-        word.classList.toggle('is-filled', i < activeCount);
-      });
-      filledCount = activeCount;
+  function build() {
+    if (tl) {
+      if (tl.scrollTrigger) tl.scrollTrigger.kill();
+      tl.kill();
+      tl = null;
     }
-    ticking = false;
+
+    wrapWords(textEl);
+
+    tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: textEl,
+        start: 'top 82%',
+        end: 'bottom 50%',
+        scrub: 0.6,
+      },
+    });
+
+    // 0.35 step vs 1.0 duration: several words are mid-fade at once,
+    // so it reads as a wave rather than one-by-one blinking.
+    textEl.querySelectorAll('.sw, ' + MEDIA).forEach((item, i) => {
+      if (item.classList.contains('sw')) {
+        tl.to(item, { opacity: 1, duration: 1, ease: 'none' }, i * 0.35);
+      } else {
+        gsap.set(item, { scale: 0 });
+        tl.to(item, { scale: 1, duration: 2, ease: 'back.out(2)' }, i * 0.35);
+      }
+    });
   }
 
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(updateFill);
+  build();
+  // AonixI18N replaces the text (and with it the old spans) on a
+  // language switch — re-split and rebuild against the new words.
+  AonixI18N.onChange(build);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => ScrollTrigger.refresh());
   }
-
-  // Re-split into word spans whenever [data-i18n] has just replaced
-  // textEl's textContent with a translated string (see AonixI18N
-  // above) — otherwise the old English <span class="word"> markup
-  // would keep showing through the new language's raw text.
-  function refresh() {
-    words = splitIntoWords();
-    filledCount = -1;
-    updateFill();
-  }
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
-  refresh();
-  AonixI18N.onChange(refresh);
 })();
 
 // Dock nav CTA color swap: while the fixed dock nav overlaps the
@@ -537,8 +800,10 @@ const AonixI18N = (function () {
   const items = Array.from(document.querySelectorAll('.faq-item'));
   if (!items.length) return;
 
-  const DURATION = 300;
-  const EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
+  // Slow-out curve (same as --hover-ease in css/style.css): moves off
+  // quickly, then glides into place instead of stopping dead.
+  const DURATION = 650;
+  const EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
   // Per item: the in-flight animation plus a request token. Rapid
   // clicking can fire a stale animation's "finish" event *after* a
   // newer one has already taken over the same element/property (a
@@ -572,14 +837,46 @@ const AonixI18N = (function () {
     };
   }
 
+  // The answer text fades/slides in a beat after the box starts
+  // opening, and fades out quickly on close, so the text never pops
+  // in or gets visibly sliced by the shrinking box.
+  function fadeAnswer(item, show) {
+    const answer = item.querySelector('.faq-answer');
+    if (!answer) return;
+    answer.getAnimations().forEach((a) => a.cancel());
+    if (show) {
+      answer.animate(
+        [{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }],
+        { duration: 500, delay: 120, easing: EASING, fill: 'backwards' }
+      );
+    } else {
+      // Held at 0 (fill: forwards) until the box has fully closed —
+      // collapse() clears it once <details> is shut.
+      answer.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        { duration: 250, easing: 'ease-out', fill: 'forwards' }
+      );
+    }
+  }
+
+  function clearAnswer(item) {
+    const answer = item.querySelector('.faq-answer');
+    if (answer) answer.getAnimations().forEach((a) => a.cancel());
+  }
+
   function expand(item) {
     item.open = true;
+    fadeAnswer(item, true);
     animateTo(item, item.scrollHeight);
   }
 
   function collapse(item) {
     const summaryHeight = item.querySelector('summary').offsetHeight;
-    animateTo(item, summaryHeight, () => { item.open = false; });
+    fadeAnswer(item, false);
+    animateTo(item, summaryHeight, () => {
+      item.open = false;
+      clearAnswer(item);
+    });
   }
 
   // Bound to the whole item, not just the summary: once a question is
@@ -637,31 +934,106 @@ const AonixI18N = (function () {
   });
 })();
 
-// Reveal-on-scroll: adds .is-visible (see .reveal in css/style.css)
-// to each .reveal element the first time it enters the viewport, then
-// stops watching it — a one-shot fade/slide-in, not a repeating
-// scroll effect.
+// Text & block reveals (see TEXT REVEALS in css/style.css):
+//  - [data-split] headings: split at their explicit <br>s into masked
+//    lines that slide up, staggered. Never split by measured wraps — a
+//    long line that wraps moves up as one block, on purpose.
+//  - .big-word ("AONIX STUDIO" in the hero): one span per letter,
+//    rising letter by letter once body.is-ready lands.
+//  - .reveal blocks (cards etc.): fade + slide up.
+// One shared IntersectionObserver adds .is-in once and stops
+// watching. Hero content is excluded — it's under the preloader at
+// load, so it runs off AonixReady instead (heading 500ms after ready,
+// note/badges via a CSS delay). The hidden starting states only exist
+// under html.anim, so without JS / with reduced motion all of this is
+// simply visible.
 (function () {
-  const targets = document.querySelectorAll('.reveal');
-  if (!targets.length) return;
-
-  if (!('IntersectionObserver' in window)) {
-    targets.forEach((el) => el.classList.add('is-visible'));
-    return;
+  function splitLines(el) {
+    const parts = el.innerHTML
+      .split(/<br\s*\/?>/i)
+      .map((part) => part.trim())
+      .filter(Boolean);
+    // The ' ' between the block-level lines collapses visually but
+    // keeps words apart in textContent (screen readers / SEO).
+    el.innerHTML = parts
+      .map((part) => `<span class="split-line"><span class="split-line-in">${part}</span></span>`)
+      .join(' ');
   }
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      });
-    },
-    { threshold: 0.15, rootMargin: '0px 0px -8% 0px' }
-  );
+  function splitLetters(el) {
+    let i = 0;
+    el.innerHTML = el.textContent
+      .trim()
+      .split(/\s+/)
+      .map((word) => `<span class="bw">${Array.from(word)
+        .map((ch) => `<span style="--i:${i++}">${ch}</span>`)
+        .join('')}</span>`)
+      .join(' ');
+  }
 
-  targets.forEach((el) => observer.observe(el));
+  document.querySelectorAll('[data-split]').forEach(splitLines);
+  document.querySelectorAll('.big-word').forEach(splitLetters);
+
+  // A language switch rewrites these headings' innerHTML — split the
+  // new text again. .is-in stays on the element, so headings that
+  // were already revealed come back fully visible (no replay).
+  AonixI18N.onChange(() => {
+    document.querySelectorAll('[data-split]').forEach(splitLines);
+  });
+
+  const targets = Array.from(document.querySelectorAll('.reveal, [data-split]'))
+    .filter((el) => !el.closest('.hero'));
+
+  if (!('IntersectionObserver' in window)) {
+    targets.forEach((el) => el.classList.add('is-in'));
+  } else {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.2, rootMargin: '0px 0px -8% 0px' }
+    );
+    targets.forEach((el) => io.observe(el));
+  }
+
+  AonixReady.then(() => {
+    setTimeout(() => {
+      document.querySelectorAll('.hero [data-split], .hero .reveal').forEach((el) => {
+        el.classList.add('is-in');
+      });
+    }, 500);
+  });
+})();
+
+// Project photo parallax: while a card crosses the viewport its photo
+// drifts from -5% to +5% inside the frame (scrubbed, reverses on
+// scroll up). Drives the --py custom property, read by the img's
+// translate in css/style.css — separate from the entrance zoom on
+// transform, so the two never overwrite each other.
+(function () {
+  if (!window.gsap || !window.ScrollTrigger) return;
+  if (!document.documentElement.classList.contains('anim')) return;
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll('.project-thumb').forEach((thumb) => {
+    const img = thumb.querySelector('.project-thumb-media img');
+    if (!img) return;
+    gsap.fromTo(img, { '--py': '-5%' }, {
+      '--py': '5%',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: thumb,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true,
+      },
+    });
+  });
 })();
 
 // Contact modal: opened by every [data-open-contact] trigger (the
@@ -687,6 +1059,7 @@ const AonixI18N = (function () {
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    if (AonixScroll) AonixScroll.stop();
     // The backdrop's blur has to be recomputed every frame anything
     // behind it changes — with the gradient sweeps, the marquee
     // scroll and the hero badges' own blur(40px) glass all still
@@ -703,6 +1076,7 @@ const AonixI18N = (function () {
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    if (AonixScroll) AonixScroll.start();
     document.body.classList.remove('modal-open');
     if (lastFocused) lastFocused.focus();
   }

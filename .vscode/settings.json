@@ -1,0 +1,7 @@
+{
+    "liveServer.settings.port": 5501,
+    // /ua/... and /en/... don't exist as files — on Vercel vercel.json
+    // rewrites them; here Live Server falls back to index.html instead
+    // of a 404 (index.html forwards /xx/privacy.html to the real page).
+    "liveServer.settings.file": "index.html"
+}
